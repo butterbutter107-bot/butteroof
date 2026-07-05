@@ -329,6 +329,29 @@ body {
   line-height: 1.7;
 }
 
+.instructor-message {
+  margin-bottom: 28px;
+  border-left: 2px solid var(--accent);
+  padding-left: 20px;
+}
+
+.instructor-message p {
+  font-size: 0.9rem;
+  color: var(--text-mid);
+  margin-bottom: 10px;
+  line-height: 1.8;
+}
+
+.instructor-message p:last-child {
+  margin-bottom: 0;
+}
+
+.instructor-message .message-closing {
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
 .career-list {
   display: flex;
   flex-direction: column;
