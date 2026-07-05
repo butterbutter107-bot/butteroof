@@ -476,14 +476,14 @@ body {
   color: var(--blue);
 }
 
-.course-badge.mid {
-  background: #e8f5e9;
-  color: #2e7d32;
+.course-badge.axis {
+  background: #fef9e7;
+  color: #b7950b;
 }
 
-.course-badge.practice {
-  background: #fff3e0;
-  color: #e65100;
+.course-badge.mock {
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 
 .course-badge.final {
@@ -492,15 +492,15 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  .course-badge.mid { background: #1a3d1a; }
-  .course-badge.practice { background: #3d2a1a; }
+  .course-badge.axis { background: #3d351a; }
+  .course-badge.mock { background: #1a3d1a; }
   .course-badge.final { background: #3d1a1a; }
 }
-:root[data-theme="dark"] .course-badge.mid { background: #1a3d1a; }
-:root[data-theme="dark"] .course-badge.practice { background: #3d2a1a; }
+:root[data-theme="dark"] .course-badge.axis { background: #3d351a; }
+:root[data-theme="dark"] .course-badge.mock { background: #1a3d1a; }
 :root[data-theme="dark"] .course-badge.final { background: #3d1a1a; }
-:root[data-theme="light"] .course-badge.mid { background: #e8f5e9; }
-:root[data-theme="light"] .course-badge.practice { background: #fff3e0; }
+:root[data-theme="light"] .course-badge.axis { background: #fef9e7; }
+:root[data-theme="light"] .course-badge.mock { background: #e8f5e9; }
 :root[data-theme="light"] .course-badge.final { background: #fce4e4; }
 
 .course-name {
