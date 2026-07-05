@@ -477,8 +477,12 @@ body {
 }
 
 .course-badge.axis {
-  background: #fef9e7;
-  color: #b7950b;
+  background: #fdf0d0;
+  color: #a67c00;
+}
+
+#axis-reading .week-num {
+  background: #c9a227;
 }
 
 .course-badge.mock {
@@ -492,14 +496,17 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  .course-badge.axis { background: #3d351a; }
+  .course-badge.axis { background: #3d351a; color: #d4b94e; }
+  #axis-reading .week-num { background: #b8922a; }
   .course-badge.mock { background: #1a3d1a; }
   .course-badge.final { background: #3d1a1a; }
 }
-:root[data-theme="dark"] .course-badge.axis { background: #3d351a; }
+:root[data-theme="dark"] .course-badge.axis { background: #3d351a; color: #d4b94e; }
+:root[data-theme="dark"] #axis-reading .week-num { background: #b8922a; }
 :root[data-theme="dark"] .course-badge.mock { background: #1a3d1a; }
 :root[data-theme="dark"] .course-badge.final { background: #3d1a1a; }
-:root[data-theme="light"] .course-badge.axis { background: #fef9e7; }
+:root[data-theme="light"] .course-badge.axis { background: #fdf0d0; }
+:root[data-theme="light"] #axis-reading .week-num { background: #c9a227; }
 :root[data-theme="light"] .course-badge.mock { background: #e8f5e9; }
 :root[data-theme="light"] .course-badge.final { background: #fce4e4; }
 
