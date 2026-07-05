@@ -476,15 +476,31 @@ body {
   color: var(--blue);
 }
 
+.course-badge.mid {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.course-badge.practice {
+  background: #fff3e0;
+  color: #e65100;
+}
+
 .course-badge.final {
   background: #fce4e4;
   color: var(--accent);
 }
 
 @media (prefers-color-scheme: dark) {
+  .course-badge.mid { background: #1a3d1a; }
+  .course-badge.practice { background: #3d2a1a; }
   .course-badge.final { background: #3d1a1a; }
 }
+:root[data-theme="dark"] .course-badge.mid { background: #1a3d1a; }
+:root[data-theme="dark"] .course-badge.practice { background: #3d2a1a; }
 :root[data-theme="dark"] .course-badge.final { background: #3d1a1a; }
+:root[data-theme="light"] .course-badge.mid { background: #e8f5e9; }
+:root[data-theme="light"] .course-badge.practice { background: #fff3e0; }
 :root[data-theme="light"] .course-badge.final { background: #fce4e4; }
 
 .course-name {
