@@ -1,12 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const navbar = document.getElementById('navbar');
-  const navToggle = document.getElementById('navToggle');
-  const navLinks = document.getElementById('navLinks');
-  const contactForm = document.getElementById('contactForm');
-
-  window.addEventListener('scroll', function () {
-    navbar.classList.toggle('scrolled', window.scrollY > 10);
-  });
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+  var contactForm = document.getElementById('contactForm');
 
   navToggle.addEventListener('click', function () {
     navLinks.classList.toggle('active');
@@ -21,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
   contactForm.addEventListener('submit', function (e) {
     e.preventDefault();
     var name = document.getElementById('name').value;
-    alert(name + '님, 문의가 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
+    alert(name + '님, 상담 신청이 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
     contactForm.reset();
   });
 
@@ -40,10 +35,4 @@ document.addEventListener('DOMContentLoaded', function () {
     section.classList.add('fade-in');
     observer.observe(section);
   });
-
-  var style = document.createElement('style');
-  style.textContent =
-    '.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }' +
-    '.fade-in.visible { opacity: 1; transform: translateY(0); }';
-  document.head.appendChild(style);
 });
