@@ -289,18 +289,13 @@ body {
   align-items: start;
 }
 
-.photo-placeholder {
+.photo-img {
   width: 240px;
   height: 300px;
-  background: var(--bg-alt);
-  border: 1px solid var(--border);
+  object-fit: cover;
+  object-position: top;
   border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-light);
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
+  border: 1px solid var(--border);
 }
 
 .instructor-label {
@@ -856,7 +851,7 @@ body {
     gap: 28px;
   }
 
-  .photo-placeholder {
+  .photo-img {
     width: 180px;
     height: 225px;
   }
