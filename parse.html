@@ -255,6 +255,7 @@
       }
 
       var chunks = buildChunks(words);
+      chunks = ensureVerb(chunks, words);
       renderDiagram(chunks);
     }
 
@@ -342,6 +343,76 @@
         if (hasTag(words[k], 'Verb') || hasTag(words[k], 'PastTense') || hasTag(words[k], 'PresentTense') || hasTag(words[k], 'Modal')) return true;
       }
       return false;
+    }
+
+    function hasVerbTag(word) {
+      var vt = ['Verb','PastTense','PresentTense','Modal','Auxiliary','Copula','FutureTense','Infinitive'];
+      for (var i = 0; i < vt.length; i++) { if (hasTag(word, vt[i])) return true; }
+      return false;
+    }
+
+    function ensureVerb(chunks, words) {
+      var hasVerb = false;
+      for (var i = 0; i < chunks.length; i++) {
+        if (chunks[i].role === 'V') { hasVerb = true; break; }
+      }
+      if (hasVerb) return chunks;
+
+      var verbIdx = -1;
+      for (var i = 0; i < words.length; i++) {
+        if (hasVerbTag(words[i]) && !hasTag(words[i], 'Gerund') && !hasTag(words[i], 'Participle')) {
+          verbIdx = i;
+          break;
+        }
+      }
+      if (verbIdx === -1) {
+        for (var i = 0; i < words.length; i++) {
+          if (hasVerbTag(words[i])) { verbIdx = i; break; }
+        }
+      }
+      if (verbIdx === -1) return chunks;
+
+      var verbWord = words[verbIdx].lower;
+      for (var i = 0; i < chunks.length; i++) {
+        var ct = chunks[i].text.toLowerCase();
+        if (ct.indexOf(verbWord) !== -1 && chunks[i].pos !== '동') {
+          var parts = splitChunkAtVerb(chunks[i], verbWord);
+          if (parts) {
+            var newChunks = chunks.slice(0, i);
+            for (var p = 0; p < parts.length; p++) newChunks.push(parts[p]);
+            for (var j = i + 1; j < chunks.length; j++) newChunks.push(chunks[j]);
+            return newChunks;
+          }
+          chunks[i].pos = '동';
+          chunks[i].role = 'V';
+          return chunks;
+        }
+        if (chunks[i].pos === '동' && !chunks[i].role) {
+          chunks[i].role = 'V';
+          return chunks;
+        }
+      }
+      return chunks;
+    }
+
+    function splitChunkAtVerb(chunk, verbWord) {
+      var text = chunk.text;
+      var lower = text.toLowerCase();
+      var idx = -1;
+      var re = new RegExp('\\b' + verbWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b');
+      var m = re.exec(lower);
+      if (!m) return null;
+      idx = m.index;
+
+      var before = text.substring(0, idx).trim();
+      var verb = text.substring(idx, idx + verbWord.length);
+      var after = text.substring(idx + verbWord.length).trim();
+
+      var parts = [];
+      if (before) parts.push({ text: before, pos: chunk.pos, role: chunk.role });
+      parts.push({ text: verb, pos: '동', role: 'V' });
+      if (after) parts.push({ text: after, pos: '명', role: 'O' });
+      return parts.length > 1 ? parts : null;
     }
 
     function buildChunks(words) {
@@ -498,6 +569,7 @@
           i++;
           while (i < words.length) {
             var nLower = words[i].lower;
+            if (foundSubject && !foundVerb && hasVerbTag(words[i]) && !hasTag(words[i], 'Gerund') && !hasTag(words[i], 'Participle')) break;
             var np2 = getPOS(words[i], ctx);
             if (np2 === '명' || np2 === '형' || nLower === 'of') {
               nounWords.push(words[i]);
