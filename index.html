@@ -16,10 +16,9 @@
       </button>
       <ul class="nav-links" id="navLinks">
         <li><a href="#about">강사 소개</a></li>
-        <li><a href="#curriculum">커리큘럼</a></li>
+        <li><a href="#curriculum">수능/내신</a></li>
         <li><a href="#courses">수업 안내</a></li>
-        <li><a href="#reviews">수강 후기</a></li>
-        <li><a href="#contact">상담 문의</a></li>
+        <li><a href="#review-materials">복습자료</a></li>
       </ul>
     </div>
   </nav>
@@ -31,7 +30,6 @@
       <p class="hero-desc">기초부터 1등급까지, 하나의 시스템으로 완성합니다.</p>
       <div class="hero-buttons">
         <a href="#curriculum" class="btn btn-primary">커리큘럼 보기</a>
-        <a href="#contact" class="btn btn-outline">상담 신청</a>
       </div>
     </div>
   </header>
@@ -249,116 +247,31 @@
     </div>
   </section>
 
-  <section id="reviews" class="section section-alt">
+  <section id="review-materials" class="section section-alt">
     <div class="container">
-      <p class="section-label">REVIEWS · 수강 후기</p>
-      <h2 class="section-title">수강생의 이야기</h2>
-      <div class="reviews">
-        <div class="review-card">
-          <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="review-text">"품사로 문장을 읽는다는 게 처음엔 이해가 안 됐는데, 3주차부터 긴 문장이 눈에 들어오기 시작했어요. 모의고사 4등급에서 2등급으로 올랐습니다."</p>
-          <div class="review-author">
-            <div class="review-avatar">김</div>
-            <div>
-              <strong>김OO 학생</strong>
-              <span>고2 · THE FOUNDATION 수강</span>
-            </div>
-          </div>
+      <p class="section-label">REVIEW MATERIALS · 복습자료</p>
+      <h2 class="section-title">복습자료</h2>
+      <p class="review-materials-desc">수업별 복습자료를 확인하세요. 자료는 수업 후 업데이트됩니다.</p>
+      <div class="materials-grid">
+        <div class="material-card">
+          <span class="course-badge basic">기초 · 구조</span>
+          <h3>THE FOUNDATION</h3>
+          <p>준비 중입니다.</p>
         </div>
-        <div class="review-card">
-          <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="review-text">"킬러 문제만 모아서 타임어택으로 푸는 건 다른 데선 못 해본 훈련이에요. 빈칸추론이 제일 약했는데, 이제는 구조로 접근하니까 안정적으로 맞힙니다."</p>
-          <div class="review-author">
-            <div class="review-avatar">이</div>
-            <div>
-              <strong>이OO 학생</strong>
-              <span>고3 · AXIS : KILLER 수강</span>
-            </div>
-          </div>
+        <div class="material-card">
+          <span class="course-badge axis">실전 · 논리</span>
+          <h3>AXIS : 독해의 축</h3>
+          <p>준비 중입니다.</p>
         </div>
-        <div class="review-card">
-          <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="review-text">"아이가 영어 문장을 구조로 읽는 습관이 생겼어요. 선생님의 체계적인 커리큘럼 덕분에 기초부터 탄탄하게 잡을 수 있었습니다."</p>
-          <div class="review-author">
-            <div class="review-avatar">박</div>
-            <div>
-              <strong>박OO 학부모님</strong>
-              <span>고1 · THE FOUNDATION 수강</span>
-            </div>
-          </div>
+        <div class="material-card">
+          <span class="course-badge mock">실전 · 점검</span>
+          <h3>AXIS : 실전모의고사</h3>
+          <p>준비 중입니다.</p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="contact" class="section">
-    <div class="container">
-      <p class="section-label">CONTACT · 상담 문의</p>
-      <h2 class="section-title">수강 상담</h2>
-      <div class="contact-grid">
-        <form class="contact-form" id="contactForm">
-          <div class="form-group">
-            <label for="name">이름</label>
-            <input type="text" id="name" name="name" required placeholder="학생 또는 학부모 이름">
-          </div>
-          <div class="form-group">
-            <label for="phone">연락처</label>
-            <input type="tel" id="phone" name="phone" required placeholder="010-0000-0000">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="grade">학년</label>
-              <select id="grade" name="grade">
-                <option value="">선택</option>
-                <option value="mid3">중3</option>
-                <option value="high1">고1</option>
-                <option value="high2">고2</option>
-                <option value="high3">고3 / N수</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="course">관심 수업</label>
-              <select id="course" name="course" required>
-                <option value="">선택해주세요</option>
-                <option value="foundation">THE FOUNDATION (기초)</option>
-                <option value="axis">AXIS : 독해의 축</option>
-                <option value="mock">AXIS : 실전모의고사</option>
-                <option value="killer">AXIS : KILLER (FINAL)</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="message">문의 내용</label>
-            <textarea id="message" name="message" rows="4" placeholder="현재 등급, 목표, 궁금한 점을 자유롭게 작성해주세요"></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary btn-full">상담 신청하기</button>
-        </form>
-        <div class="contact-info">
-          <div class="info-item">
-            <div class="info-icon">&#128205;</div>
-            <div>
-              <strong>수업 장소</strong>
-              <p>대치투에듀에스</p>
-            </div>
-          </div>
-          <div class="info-item">
-            <div class="info-icon">&#128222;</div>
-            <div>
-              <strong>전화 문의</strong>
-              <p>010-0000-0000</p>
-            </div>
-          </div>
-          <div class="info-item">
-            <div class="info-icon">&#128337;</div>
-            <div>
-              <strong>수업 시간</strong>
-              <p>THE FOUNDATION · 월 오후 3–5시<br>AXIS : 독해의 축 · 월 오후 6–8시<br>AXIS : KILLER · 월 오후 8–10시</p>
-            </div>
-          </div>
-          <div class="cta-box">
-            <p class="cta-text">마지막 한 문제까지, 완전무결하게.</p>
-            <p class="cta-sub">AXIS · 대치투에듀에스 수능영어</p>
-          </div>
+        <div class="material-card">
+          <span class="course-badge final">FINAL · 1등급 완성</span>
+          <h3>AXIS : KILLER</h3>
+          <p>준비 중입니다.</p>
         </div>
       </div>
     </div>

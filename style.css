@@ -650,168 +650,36 @@ body {
   font-weight: 300;
 }
 
-/* --- Reviews --- */
-.reviews {
+/* --- Review Materials --- */
+.review-materials-desc {
+  color: var(--text-mid);
+  font-size: 0.92rem;
+  margin-bottom: 32px;
+}
+
+.materials-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 
-.review-card {
+.material-card {
   background: var(--bg);
-  padding: 24px;
+  padding: 28px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
 }
 
-.review-stars {
-  color: #e67e22;
-  font-size: 0.9rem;
-  margin-bottom: 12px;
-  letter-spacing: 2px;
-}
-
-.review-text {
-  color: var(--text-mid);
-  font-size: 0.88rem;
-  margin-bottom: 20px;
-  line-height: 1.7;
-}
-
-.review-author {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.review-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--bg-alt);
-  border: 1px solid var(--border);
-  color: var(--text-mid);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.material-card h3 {
+  font-size: 1rem;
   font-weight: 700;
-  font-size: 0.8rem;
-}
-
-.review-author strong {
-  display: block;
-  font-size: 0.82rem;
-}
-
-.review-author span {
-  font-size: 0.72rem;
-  color: var(--text-light);
-}
-
-/* --- Contact --- */
-.contact-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-}
-
-.form-group {
-  margin-bottom: 14px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 5px;
-  letter-spacing: -0.01em;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 9px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 0.88rem;
-  font-family: inherit;
-  transition: var(--transition);
-  background: var(--bg);
-  color: var(--text);
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--text);
-}
-
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding-top: 8px;
-}
-
-.info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-}
-
-.info-icon {
-  font-size: 1.2rem;
-  width: 40px;
-  height: 40px;
-  background: var(--bg-alt);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.info-item strong {
-  display: block;
-  font-size: 0.82rem;
-  margin-bottom: 2px;
-}
-
-.info-item p {
-  font-size: 0.82rem;
-  color: var(--text-light);
-  line-height: 1.6;
-}
-
-.cta-box {
-  margin-top: 12px;
-  padding: 24px;
-  background: var(--bg-alt);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  text-align: center;
-}
-
-.cta-text {
-  font-size: 1.05rem;
-  font-weight: 700;
+  margin: 12px 0 8px;
   letter-spacing: -0.02em;
-  margin-bottom: 4px;
 }
 
-.cta-sub {
-  font-size: 0.75rem;
+.material-card p {
+  font-size: 0.85rem;
   color: var(--text-light);
-  letter-spacing: 0.05em;
 }
 
 /* --- Footer --- */
@@ -879,15 +747,7 @@ body {
     height: 225px;
   }
 
-  .reviews {
-    grid-template-columns: 1fr;
-  }
-
-  .contact-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .form-row {
+  .materials-grid {
     grid-template-columns: 1fr;
   }
 
