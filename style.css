@@ -470,6 +470,240 @@ body {
   font-weight: 600;
 }
 
+/* --- Curriculum Tabs --- */
+.curriculum-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 40px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 4px;
+  width: fit-content;
+}
+
+.curriculum-tab {
+  padding: 10px 32px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  background: transparent;
+  color: #8a847a;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+}
+
+.curriculum-tab.active {
+  background: #f0ece6;
+  color: #111;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* --- Naesin --- */
+.naesin-subtitle {
+  font-size: 0.88rem;
+  color: #8a847a;
+  margin-bottom: 40px;
+}
+
+.naesin-phase {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #2a2825;
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 8px;
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.phase-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-light);
+  font-weight: 700;
+}
+
+.phase-period {
+  font-size: 0.75rem;
+  color: #8a847a;
+}
+
+.phase-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #f0ece6;
+  margin-bottom: 6px;
+}
+
+.phase-desc {
+  font-size: 0.85rem;
+  color: #b0aaa0;
+  margin-bottom: 20px;
+}
+
+.naesin-classes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.naesin-class {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.class-label {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.naesin-class strong {
+  font-size: 0.95rem;
+  color: #f0ece6;
+}
+
+.class-time {
+  font-size: 0.75rem;
+  color: var(--accent-light);
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.naesin-class p {
+  font-size: 0.82rem;
+  color: #b0aaa0;
+  margin: 4px 0;
+}
+
+.naesin-arrow {
+  text-align: center;
+  font-size: 1.4rem;
+  color: #8a847a;
+  padding: 12px 0;
+}
+
+.naesin-schools {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.school-block {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #2a2825;
+  border-radius: 6px;
+  padding: 16px;
+  text-align: center;
+}
+
+.school-block strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #f0ece6;
+  margin-bottom: 4px;
+}
+
+.school-block span {
+  font-size: 0.75rem;
+  color: #8a847a;
+}
+
+.school-block.clinic {
+  border-color: var(--accent);
+  background: rgba(192,57,43,0.08);
+}
+
+.naesin-system {
+  margin-top: 32px;
+  padding: 32px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #2a2825;
+  border-radius: var(--radius);
+}
+
+.system-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f0ece6;
+  margin-bottom: 6px;
+}
+
+.system-desc {
+  font-size: 0.85rem;
+  color: #8a847a;
+  margin-bottom: 24px;
+}
+
+.system-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.system-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.system-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #2a2825;
+  color: #f0ece6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.system-step strong {
+  font-size: 0.9rem;
+  color: #f0ece6;
+}
+
+.system-step-type {
+  font-size: 0.75rem;
+  color: var(--accent-light);
+  margin-left: 8px;
+}
+
+.system-step p {
+  font-size: 0.82rem;
+  color: #b0aaa0;
+  margin-top: 2px;
+}
+
 /* --- Course Detail --- */
 .course-detail {
   border: 1px solid var(--border);
@@ -749,6 +983,10 @@ body {
 
   .materials-grid {
     grid-template-columns: 1fr;
+  }
+
+  .naesin-schools {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .killer-program {
