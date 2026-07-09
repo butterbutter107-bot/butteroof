@@ -119,7 +119,7 @@
     .chunk-pos-형 .chunk-label { color: var(--pos-adj); }
     .chunk-pos-부 .chunk-text { color: var(--pos-adv); border-bottom-color: var(--pos-adv); }
     .chunk-pos-부 .chunk-label { color: var(--pos-adv); }
-    .chunk-pos-none .chunk-text { color: var(--pos-none); border-bottom-color: transparent; }
+    .chunk-pos-none .chunk-text { color: var(--pos-none); border-bottom-color: var(--pos-none); }
 
     .legend {
       display: flex; flex-wrap: wrap; gap: 16px 28px; padding: 20px 24px;
@@ -274,9 +274,15 @@
         if (t === 'Adverb') return '부';
       }
 
-      if (['the','a','an','this','that','these','those','my','your','his','her','its','our','their','each','every','some','any','no','all','both','few','several','many','much','most'].indexOf(lower) !== -1) return '명';
+      var dets = ['the','a','an','this','that','these','those','my','your','his','her','its','our','their','each','every','some','any','no','all','both','few','several','many','much','most'];
+      if (dets.indexOf(lower) !== -1) return '명';
 
       return null;
+    }
+
+    function isNounLike(word) {
+      var p = getPOS(word);
+      return p === '명' || p === '형';
     }
 
     function buildChunks(words) {
@@ -314,23 +320,22 @@
           continue;
         }
 
-        if (!foundVerb && relativePronouns.indexOf(lower) !== -1 && i > 0) {
+        if (relativePronouns.indexOf(lower) !== -1 && i > 0) {
           var relWords = [w];
           i++;
           while (i < words.length) {
-            if (words[i].post.indexOf(',') !== -1 || coordConjunctions.indexOf(words[i].lower) !== -1) {
-              if (words[i].post.indexOf(',') !== -1) { relWords.push(words[i]); i++; }
-              break;
-            }
+            if (coordConjunctions.indexOf(words[i].lower) !== -1) break;
+            if (words[i].post.indexOf(',') !== -1) { relWords.push(words[i]); i++; break; }
             relWords.push(words[i]);
             i++;
-            var hasVerb = false;
+            var hasV = false;
             for (var r = 0; r < relWords.length; r++) {
-              if (relWords[r].tags.indexOf('Verb') !== -1 || relWords[r].tags.indexOf('PastTense') !== -1 || relWords[r].tags.indexOf('PresentTense') !== -1) hasVerb = true;
+              var rt = relWords[r].tags;
+              if (rt.indexOf('Verb') !== -1 || rt.indexOf('PastTense') !== -1 || rt.indexOf('PresentTense') !== -1) hasV = true;
             }
-            if (hasVerb && i < words.length) {
-              var nextPOS = getPOS(words[i]);
-              if (nextPOS === '동' || coordConjunctions.indexOf(words[i].lower) !== -1 || words[i].post.indexOf('.') !== -1) break;
+            if (hasV && i < words.length) {
+              var np = getPOS(words[i]);
+              if (np === '동' || coordConjunctions.indexOf(words[i].lower) !== -1 || words[i].post.indexOf('.') !== -1) break;
             }
           }
           var relText = relWords.map(function(rw) { return rw.pre + rw.text + rw.post; }).join('');
@@ -340,12 +345,13 @@
 
         var pos = getPOS(w);
 
-        if (pos === '명' || (!foundSubject && pos === null && ['the','a','an'].indexOf(lower) !== -1)) {
+        if (pos === '명' || pos === '형') {
           var nounWords = [w];
           i++;
           while (i < words.length) {
-            var np = getPOS(words[i]);
-            if (np === '명' || np === '형' || ['the','a','an','of','and'].indexOf(words[i].lower) !== -1) {
+            var nLower = words[i].lower;
+            var np2 = getPOS(words[i]);
+            if (np2 === '명' || np2 === '형' || nLower === 'of' || nLower === 'and') {
               nounWords.push(words[i]);
               i++;
             } else {
@@ -355,7 +361,25 @@
           var nounText = nounWords.map(function(nw) { return nw.pre + nw.text + nw.post; }).join('');
           var role = 'M';
           if (!foundSubject) { role = 'S'; foundSubject = true; }
-          else if (foundVerb) { role = 'O'; }
+          else if (foundVerb) {
+            var prevChunk = chunks.length > 0 ? chunks[chunks.length - 1] : null;
+            if (prevChunk && prevChunk.pos === '동') {
+              var vLower = prevChunk.text.toLowerCase();
+              var isBe = false;
+              for (var bv = 0; bv < beVerbs.length; bv++) {
+                if (vLower.indexOf(beVerbs[bv]) !== -1) { isBe = true; break; }
+              }
+              if (!isBe) {
+                for (var lv2 = 0; lv2 < linkingVerbs.length; lv2++) {
+                  if (vLower.indexOf(linkingVerbs[lv2]) !== -1) { isBe = true; break; }
+                }
+              }
+              role = isBe ? 'C' : 'O';
+            } else {
+              role = 'O';
+            }
+          }
+          if (pos === '형' && !foundVerb && foundSubject) role = 'M';
           chunks.push({ text: nounText.trim(), pos: '명', role: role });
           continue;
         }
@@ -365,7 +389,7 @@
           i++;
           while (i < words.length) {
             var vp = getPOS(words[i]);
-            if (vp === '동' || words[i].tags.indexOf('Auxiliary') !== -1 || words[i].tags.indexOf('Modal') !== -1 || words[i].lower === 'not' || words[i].lower === "n't") {
+            if (vp === '동' || words[i].tags.indexOf('Auxiliary') !== -1 || words[i].tags.indexOf('Modal') !== -1 || words[i].lower === 'not' || words[i].lower === "n't" || words[i].lower === 'to') {
               verbWords.push(words[i]);
               i++;
             } else {
@@ -384,7 +408,7 @@
           if (prepositions.indexOf(lower) !== -1) {
             while (i < words.length) {
               var ap = getPOS(words[i]);
-              if (ap === '명' || ap === '형' || ['the','a','an'].indexOf(words[i].lower) !== -1) {
+              if (ap === '명' || ap === '형' || ['the','a','an','this','that','these','those'].indexOf(words[i].lower) !== -1) {
                 advWords.push(words[i]);
                 i++;
               } else {
@@ -397,31 +421,17 @@
           continue;
         }
 
-        if (pos === '형') {
-          var adjWords = [w];
+        if (pos === null) {
+          if (chunks.length > 0 && chunks[chunks.length - 1].pos) {
+            chunks[chunks.length - 1].text += w.pre + w.text + w.post;
+          } else {
+            chunks.push({ text: w.pre + w.text + w.post, pos: '부', role: 'M' });
+          }
           i++;
-          while (i < words.length && getPOS(words[i]) === '형') {
-            adjWords.push(words[i]);
-            i++;
-          }
-          var adjText = adjWords.map(function(jw) { return jw.pre + jw.text + jw.post; }).join('');
-          var adjRole = 'M';
-          if (foundVerb && chunks.length > 0 && chunks[chunks.length - 1].pos === '동') {
-            var lastVerbLower = chunks[chunks.length - 1].text.toLowerCase();
-            for (var bv = 0; bv < beVerbs.length; bv++) {
-              if (lastVerbLower.indexOf(beVerbs[bv]) !== -1) { adjRole = 'C'; break; }
-            }
-            if (adjRole !== 'C') {
-              for (var lv = 0; lv < linkingVerbs.length; lv++) {
-                if (lastVerbLower.indexOf(linkingVerbs[lv]) !== -1) { adjRole = 'C'; break; }
-              }
-            }
-          }
-          chunks.push({ text: adjText.trim(), pos: '형', role: adjRole });
           continue;
         }
 
-        chunks.push({ text: w.pre + w.text + w.post, pos: pos, role: null });
+        chunks.push({ text: w.pre + w.text + w.post, pos: pos || '부', role: 'M' });
         i++;
       }
 
