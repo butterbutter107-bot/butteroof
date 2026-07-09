@@ -262,6 +262,8 @@
       return word.tags.indexOf(tag) !== -1;
     }
 
+    var toObjVerbs = ['want','wants','wanted','need','needs','needed','hope','hopes','hoped','decide','decides','decided','plan','plans','planned','agree','agrees','agreed','offer','offers','offered','promise','promises','promised','refuse','refuses','refused','learn','learns','learned','expect','expects','expected','try','tries','tried','fail','fails','failed','manage','manages','managed','afford','affords','afforded','tend','tends','tended','pretend','pretends','pretended','choose','chooses','chose','wish','wishes','wished','desire','desires','desired','like','likes','liked','love','loves','loved','hate','hates','hated','prefer','prefers','preferred','begin','begins','began','start','starts','started','continue','continues','continued','intend','intends','intended'];
+
     function getPOS(word, ctx) {
       var tags = word.tags;
       var lower = word.lower;
@@ -270,6 +272,7 @@
       if (lower === 'for' && !hasTag(word, 'Verb')) return '부';
 
       if (lower === 'not' || lower === "n't") return '부';
+      if (lower === 'there') return '부';
 
       if (['who','whom','whose','which'].indexOf(lower) !== -1) return null;
 
@@ -280,15 +283,22 @@
       if (hasTag(word, 'Pronoun')) return '명';
       if (hasTag(word, 'Determiner')) return '명';
 
-      if (hasTag(word, 'Gerund') && ctx && !ctx.foundSubject) return '명';
+      if (hasTag(word, 'Gerund')) {
+        if (ctx && !ctx.foundSubject) return '명';
+        if (ctx && ctx.foundVerb && !ctx.prevIsAux) return '명';
+        return '동';
+      }
 
-      var verbTags = ['Verb','PastTense','PresentTense','Infinitive','Modal','Auxiliary','Copula','Participle','FutureTense'];
+      if (hasTag(word, 'Participle') && !hasTag(word, 'Verb') && !hasTag(word, 'PastTense') && !hasTag(word, 'PresentTense')) {
+        return '형';
+      }
+
+      var verbTags = ['Verb','PastTense','PresentTense','Infinitive','Modal','Auxiliary','Copula','FutureTense'];
       var isVerb = false;
       for (var i = 0; i < verbTags.length; i++) {
         if (hasTag(word, verbTags[i])) { isVerb = true; break; }
       }
-      if (isVerb && !hasTag(word, 'Gerund')) return '동';
-      if (hasTag(word, 'Gerund')) return '동';
+      if (isVerb) return '동';
 
       var nounTags = ['Noun','Singular','Plural','Uncountable','ProperNoun'];
       for (var i = 0; i < nounTags.length; i++) {
@@ -339,12 +349,18 @@
       var i = 0;
       var foundSubject = false;
       var foundVerb = false;
-      var ctx = { foundSubject: false };
+      var foundObject = false;
+      var lastVerbText = '';
+      var ctx = { foundSubject: false, foundVerb: false, prevIsAux: false };
+
+      function lastChunk() { return chunks.length > 0 ? chunks[chunks.length - 1] : null; }
 
       while (i < words.length) {
         var w = words[i];
         var lower = w.lower;
         ctx.foundSubject = foundSubject;
+        ctx.foundVerb = foundVerb;
+        ctx.prevIsAux = i > 0 && (hasTag(words[i-1], 'Auxiliary') || hasTag(words[i-1], 'Copula') || beVerbs.indexOf(words[i-1].lower) !== -1);
 
         if (coordConjunctions.indexOf(lower) !== -1 && lower !== 'for') {
           chunks.push({ text: w.pre + w.text + w.post, pos: null, role: null });
@@ -354,7 +370,6 @@
 
         if (advClauseConj.indexOf(lower) !== -1 || nounClauseConj.indexOf(lower) !== -1 || subConjunctions.indexOf(lower) !== -1) {
           var isNounClause = nounClauseConj.indexOf(lower) !== -1;
-
           var clause = collectClause(words, i);
           i = clause.nextIdx;
           var clauseText = clause.words.map(function(cw) { return cw.pre + cw.text + cw.post; }).join('');
@@ -413,9 +428,22 @@
               }
             }
             var toVerbText = toVerbWords.map(function(tw) { return tw.pre + tw.text + tw.post; }).join('');
-            if (!foundVerb) {
-              foundVerb = true;
-              chunks.push({ text: toVerbText.trim(), pos: '동', role: 'V' });
+
+            if (!foundSubject) {
+              chunks.push({ text: toVerbText.trim(), pos: '명', role: 'S' });
+              foundSubject = true;
+            } else if (foundObject) {
+              chunks.push({ text: toVerbText.trim(), pos: '동', role: null });
+            } else if (foundVerb && toObjVerbs.indexOf(lastVerbText) !== -1) {
+              chunks.push({ text: toVerbText.trim(), pos: '명', role: 'O' });
+              foundObject = true;
+            } else if (foundVerb) {
+              var lc = lastChunk();
+              if (lc && lc.pos === '명' && (lc.role === 'O')) {
+                chunks.push({ text: toVerbText.trim(), pos: '동', role: null });
+              } else {
+                chunks.push({ text: toVerbText.trim(), pos: '부', role: null });
+              }
             } else {
               chunks.push({ text: toVerbText.trim(), pos: '부', role: null });
             }
@@ -433,7 +461,32 @@
               }
             }
             var prepText = prepWords.map(function(pw) { return pw.pre + pw.text + pw.post; }).join('');
-            chunks.push({ text: prepText.trim(), pos: '부', role: null });
+            var lc2 = lastChunk();
+            if (lc2 && lc2.pos === '명') {
+              chunks.push({ text: prepText.trim(), pos: '형', role: null });
+            } else {
+              chunks.push({ text: prepText.trim(), pos: '부', role: null });
+            }
+            continue;
+          }
+        }
+
+        // Participial construction at sentence start: "Having reviewed ..., ..."
+        if (i === 0 && (hasTag(w, 'Gerund') || hasTag(w, 'Participle'))) {
+          var hasCommaAhead = false;
+          for (var pc = i; pc < Math.min(i + 15, words.length); pc++) {
+            if (words[pc].post.indexOf(',') !== -1) { hasCommaAhead = true; break; }
+          }
+          if (hasCommaAhead) {
+            var partWords = [w];
+            i++;
+            while (i < words.length) {
+              partWords.push(words[i]);
+              if (words[i].post.indexOf(',') !== -1) { i++; break; }
+              i++;
+            }
+            var partText = partWords.map(function(pw2) { return pw2.pre + pw2.text + pw2.post; }).join('');
+            chunks.push({ text: partText.trim(), pos: '부', role: null });
             continue;
           }
         }
@@ -457,7 +510,7 @@
           var role = null;
           if (!foundSubject) { role = 'S'; foundSubject = true; }
           else if (foundVerb) {
-            var prevChunk = chunks.length > 0 ? chunks[chunks.length - 1] : null;
+            var prevChunk = lastChunk();
             if (prevChunk && prevChunk.pos === '동') {
               var vLower = prevChunk.text.toLowerCase();
               var isBe = false;
@@ -473,6 +526,7 @@
             } else {
               role = 'O';
             }
+            foundObject = true;
           }
           chunks.push({ text: nounText.trim(), pos: '명', role: role });
           continue;
@@ -492,6 +546,7 @@
           }
           var verbText = verbWords.map(function(vw) { return vw.pre + vw.text + vw.post; }).join('');
           foundVerb = true;
+          lastVerbText = verbWords[verbWords.length - 1].lower;
           chunks.push({ text: verbText.trim(), pos: '동', role: 'V' });
           continue;
         }
@@ -511,7 +566,12 @@
             }
           }
           var advText = advWords.map(function(aw) { return aw.pre + aw.text + aw.post; }).join('');
-          chunks.push({ text: advText.trim(), pos: '부', role: null });
+          var lc3 = lastChunk();
+          if (prepositions.indexOf(lower) !== -1 && lc3 && lc3.pos === '명' && lower !== 'not') {
+            chunks.push({ text: advText.trim(), pos: '형', role: null });
+          } else {
+            chunks.push({ text: advText.trim(), pos: '부', role: null });
+          }
           continue;
         }
 
