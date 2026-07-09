@@ -916,6 +916,19 @@ body {
   color: var(--text-light);
 }
 
+.material-link {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--blue);
+  text-decoration: none;
+  transition: opacity 0.25s;
+}
+
+.material-link:hover {
+  opacity: 0.7;
+}
+
 /* --- Footer --- */
 .footer {
   border-top: 1px solid var(--border);

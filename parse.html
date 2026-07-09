@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>직독직해 다이어그램 · THE FOUNDATION · 박태수T</title>
+  <script src="https://unpkg.com/compromise"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #ffffff; --bg-alt: #f7f7f5; --text: #1a1a1a; --text-mid: #4a4a4a;
+      --text-light: #717171; --border: #e0ddd8; --accent: #c0392b;
+      --pos-noun: rgb(37, 99, 170); --pos-verb: rgb(196, 90, 17);
+      --pos-adj: rgb(124, 58, 173); --pos-adv: rgb(31, 122, 90);
+      --pos-none: rgb(30, 30, 30);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111111; --bg-alt: #1a1917; --text: #e8e4de; --text-mid: #b0aaa0;
+        --text-light: #8a847a; --border: #2a2825;
+        --pos-noun: rgb(90, 160, 230); --pos-verb: rgb(235, 140, 70);
+        --pos-adj: rgb(175, 120, 220); --pos-adv: rgb(80, 190, 145);
+        --pos-none: rgb(180, 180, 180);
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #111111; --bg-alt: #1a1917; --text: #e8e4de; --text-mid: #b0aaa0;
+      --text-light: #8a847a; --border: #2a2825;
+      --pos-noun: rgb(90, 160, 230); --pos-verb: rgb(235, 140, 70);
+      --pos-adj: rgb(175, 120, 220); --pos-adv: rgb(80, 190, 145);
+      --pos-none: rgb(180, 180, 180);
+    }
+    :root[data-theme="light"] {
+      --bg: #ffffff; --bg-alt: #f7f7f5; --text: #1a1a1a; --text-mid: #4a4a4a;
+      --text-light: #717171; --border: #e0ddd8;
+      --pos-noun: rgb(37, 99, 170); --pos-verb: rgb(196, 90, 17);
+      --pos-adj: rgb(124, 58, 173); --pos-adv: rgb(31, 122, 90);
+      --pos-none: rgb(30, 30, 30);
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+    .header {
+      border-bottom: 1px solid var(--border); padding: 16px 0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header a { text-decoration: none; color: var(--text); font-size: 0.9rem; font-weight: 600; }
+    .logo-t { color: var(--accent); }
+    .back-link { font-size: 0.82rem; color: var(--text-light); text-decoration: none; }
+    .back-link:hover { color: var(--text); }
+    .main { padding: 60px 0 80px; }
+    .page-label {
+      font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-light); margin-bottom: 12px;
+    }
+    .page-title {
+      font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px;
+    }
+    .page-desc { font-size: 0.9rem; color: var(--text-mid); margin-bottom: 40px; }
+    .input-area { margin-bottom: 32px; }
+    .input-area textarea {
+      width: 100%; padding: 16px; border: 1px solid var(--border); border-radius: 8px;
+      font-size: 1rem; font-family: inherit; line-height: 1.8; resize: vertical;
+      background: var(--bg); color: var(--text); min-height: 100px;
+      transition: border-color 0.25s ease;
+    }
+    .input-area textarea:focus { outline: none; border-color: var(--text); }
+    .input-area textarea::placeholder { color: var(--text-light); }
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-analyze {
+      padding: 11px 28px; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+      border: none; cursor: pointer; font-family: inherit;
+      background: var(--text); color: var(--bg); transition: opacity 0.25s;
+    }
+    .btn-analyze:hover { opacity: 0.85; }
+    .btn-clear {
+      padding: 11px 20px; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+      border: 1.5px solid var(--border); cursor: pointer; font-family: inherit;
+      background: transparent; color: var(--text); transition: border-color 0.25s;
+    }
+    .btn-clear:hover { border-color: var(--text); }
+
+    .diagram-area {
+      padding: 32px; background: var(--bg-alt); border: 1px solid var(--border);
+      border-radius: 8px; min-height: 100px; margin-bottom: 32px;
+      overflow-x: auto;
+    }
+    .diagram-area:empty::before {
+      content: '위에 영어 문장을 입력하고 분석 버튼을 눌러주세요.';
+      color: var(--text-light); font-size: 0.9rem;
+    }
+    .diagram-line {
+      display: flex; flex-wrap: wrap; align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .chunk {
+      display: inline-flex; flex-direction: column; align-items: center;
+      margin: 0 1px;
+    }
+    .chunk-text {
+      font-size: 1.1rem; line-height: 1.6; padding: 2px 4px;
+      border-bottom: 2.5px solid transparent; white-space: nowrap;
+    }
+    .chunk-text.has-pos { cursor: default; }
+    .chunk-label {
+      font-size: 0.7rem; font-weight: 700; margin-top: 4px;
+      letter-spacing: 0.02em; white-space: nowrap;
+    }
+    .chunk-space { width: 6px; }
+
+    .chunk-pos-명 .chunk-text { color: var(--pos-noun); border-bottom-color: var(--pos-noun); }
+    .chunk-pos-명 .chunk-label { color: var(--pos-noun); }
+    .chunk-pos-동 .chunk-text { color: var(--pos-verb); border-bottom-color: var(--pos-verb); }
+    .chunk-pos-동 .chunk-label { color: var(--pos-verb); }
+    .chunk-pos-형 .chunk-text { color: var(--pos-adj); border-bottom-color: var(--pos-adj); }
+    .chunk-pos-형 .chunk-label { color: var(--pos-adj); }
+    .chunk-pos-부 .chunk-text { color: var(--pos-adv); border-bottom-color: var(--pos-adv); }
+    .chunk-pos-부 .chunk-label { color: var(--pos-adv); }
+    .chunk-pos-none .chunk-text { color: var(--pos-none); border-bottom-color: transparent; }
+
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 16px 28px; padding: 20px 24px;
+      background: var(--bg-alt); border: 1px solid var(--border); border-radius: 8px;
+      margin-bottom: 40px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-label { color: var(--text-mid); font-weight: 600; }
+    .legend-role { font-size: 0.72rem; color: var(--text-light); }
+
+    .examples { margin-top: 40px; }
+    .examples-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 12px; color: var(--text-mid); }
+    .example-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .example-chip {
+      padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px;
+      font-size: 0.8rem; color: var(--text-mid); cursor: pointer;
+      background: transparent; font-family: inherit; transition: 0.25s ease;
+      text-align: left;
+    }
+    .example-chip:hover { border-color: var(--text); color: var(--text); }
+
+    .guide { margin-top: 40px; }
+    .guide-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 12px; color: var(--text-mid); }
+    .guide-table {
+      width: 100%; border-collapse: collapse; font-size: 0.82rem;
+      overflow-x: auto; display: block;
+    }
+    .guide-table th, .guide-table td {
+      padding: 8px 14px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .guide-table th {
+      font-weight: 600; color: var(--text-light); font-size: 0.72rem;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .guide-table td { color: var(--text-mid); }
+
+    @media (max-width: 768px) {
+      .diagram-area { padding: 20px; }
+      .chunk-text { font-size: 0.95rem; }
+      .chunk-label { font-size: 0.65rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <a href="index.html">박태수<span class="logo-t">T</span></a>
+      <a href="index.html#review-materials" class="back-link">&larr; 복습자료로 돌아가기</a>
+    </div>
+  </div>
+
+  <div class="container main">
+    <p class="page-label">THE FOUNDATION · 직독직해 다이어그램</p>
+    <h1 class="page-title">직독직해 다이어그램</h1>
+    <p class="page-desc">문장을 의미 단위(chunk)로 나누고, 품사 색상과 문장성분 라벨(S/V/O/C/M)로 구조를 시각화합니다.</p>
+
+    <div class="input-area">
+      <textarea id="sentenceInput" placeholder="영어 문장을 입력하세요.&#10;예: Many successful entrepreneurs attribute their achievements not to natural talent but to years of disciplined practice."></textarea>
+      <div class="btn-row">
+        <button class="btn-analyze" id="analyzeBtn">분석하기</button>
+        <button class="btn-clear" id="clearBtn">지우기</button>
+      </div>
+    </div>
+
+    <div class="diagram-area" id="diagramArea"></div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pos-noun)"></span><span class="legend-label">명사</span><span class="legend-role">S / O / C</span></div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pos-verb)"></span><span class="legend-label">동사</span><span class="legend-role">V</span></div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pos-adj)"></span><span class="legend-label">형용사</span><span class="legend-role">M</span></div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pos-adv)"></span><span class="legend-label">부사</span><span class="legend-role">M</span></div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pos-none)"></span><span class="legend-label">접속사</span><span class="legend-role">무색</span></div>
+    </div>
+
+    <div class="examples">
+      <p class="examples-title">예문으로 바로 분석해보기</p>
+      <div class="example-chips">
+        <button class="example-chip">Many successful entrepreneurs attribute their achievements not to natural talent but to years of disciplined practice.</button>
+        <button class="example-chip">The student who studies hard every day will achieve remarkable results on the exam.</button>
+        <button class="example-chip">Although the weather was extremely cold, she decided to walk to school because she wanted some fresh air.</button>
+        <button class="example-chip">Reading books every day significantly improves your vocabulary and critical thinking skills.</button>
+      </div>
+    </div>
+
+    <div class="guide">
+      <p class="guide-title">문장성분 라벨 안내</p>
+      <table class="guide-table">
+        <thead><tr><th>라벨</th><th>문장성분</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td><strong>S</strong></td><td>주어</td><td>문장의 주체 (명사구)</td></tr>
+          <tr><td><strong>V</strong></td><td>동사</td><td>서술어 (동사구)</td></tr>
+          <tr><td><strong>O</strong></td><td>목적어</td><td>동사의 대상 (명사구)</td></tr>
+          <tr><td><strong>C</strong></td><td>보어</td><td>주어/목적어를 보충 설명</td></tr>
+          <tr><td><strong>M</strong></td><td>수식어</td><td>부사구, 형용사구, 전치사구 등</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    var input = document.getElementById('sentenceInput');
+    var diagramArea = document.getElementById('diagramArea');
+    var analyzeBtn = document.getElementById('analyzeBtn');
+    var clearBtn = document.getElementById('clearBtn');
+
+    var coordConjunctions = ['and','but','or','nor','yet','so','for'];
+    var prepositions = ['in','on','at','to','for','with','by','from','of','about','into','through','during','before','after','above','below','between','under','over','against','along','among','around','behind','beneath','beside','beyond','down','inside','near','off','onto','out','outside','past','since','toward','towards','until','upon','within','without','across','throughout','up','except','despite'];
+    var subConjunctions = ['because','although','though','while','whereas','if','unless','since','until','when','whenever','where','wherever','once','than','whether','as','so that','even though','even if','in order to'];
+    var relativePronouns = ['who','whom','whose','which','that','where','when','why'];
+    var beVerbs = ['is','are','was','were','am','be','been','being'];
+    var linkingVerbs = ['become','became','seem','seemed','appear','appeared','remain','remained','feel','felt','look','looked','sound','sounded','taste','tasted','smell','smelled','grow','grew','turn','turned','prove','proved','get','got','stay','stayed'];
+
+    function analyze() {
+      var text = input.value.trim();
+      if (!text) return;
+
+      var doc = nlp(text);
+      var terms = doc.termList();
+
+      var words = [];
+      for (var i = 0; i < terms.length; i++) {
+        var t = terms[i];
+        var tags = Object.keys(t.tags || {});
+        words.push({
+          text: t.text,
+          pre: t.pre || '',
+          post: t.post || '',
+          tags: tags,
+          lower: (t.text || '').toLowerCase()
+        });
+      }
+
+      var chunks = buildChunks(words);
+      renderDiagram(chunks);
+    }
+
+    function getPOS(word) {
+      var tags = word.tags;
+      var lower = word.lower;
+
+      if (coordConjunctions.indexOf(lower) !== -1) return null;
+      if (prepositions.indexOf(lower) !== -1) return '부';
+
+      for (var i = 0; i < tags.length; i++) {
+        var t = tags[i];
+        if (t === 'Pronoun') return '명';
+        if (['Noun','Singular','Plural','Uncountable','ProperNoun'].indexOf(t) !== -1) return '명';
+        if (['Verb','PastTense','PresentTense','Gerund','Infinitive','Modal','Auxiliary','Copula','Participle','FutureTense'].indexOf(t) !== -1) return '동';
+        if (['Adjective','Comparable','Superlative'].indexOf(t) !== -1) return '형';
+        if (t === 'Adverb') return '부';
+      }
+
+      if (['the','a','an','this','that','these','those','my','your','his','her','its','our','their','each','every','some','any','no','all','both','few','several','many','much','most'].indexOf(lower) !== -1) return '명';
+
+      return null;
+    }
+
+    function buildChunks(words) {
+      var chunks = [];
+      var i = 0;
+      var foundSubject = false;
+      var foundVerb = false;
+
+      while (i < words.length) {
+        var w = words[i];
+        var lower = w.lower;
+
+        if (coordConjunctions.indexOf(lower) !== -1) {
+          chunks.push({ text: w.pre + w.text + w.post, pos: null, role: null });
+          i++;
+          continue;
+        }
+
+        if (subConjunctions.indexOf(lower) !== -1) {
+          var clauseWords = [w];
+          i++;
+          var depth = 0;
+          while (i < words.length) {
+            if (words[i].post.indexOf(',') !== -1 && depth === 0) {
+              clauseWords.push(words[i]);
+              i++;
+              break;
+            }
+            if (subConjunctions.indexOf(words[i].lower) !== -1) depth++;
+            clauseWords.push(words[i]);
+            i++;
+          }
+          var clauseText = clauseWords.map(function(cw) { return cw.pre + cw.text + cw.post; }).join('');
+          chunks.push({ text: clauseText.trim(), pos: '부', role: 'M' });
+          continue;
+        }
+
+        if (!foundVerb && relativePronouns.indexOf(lower) !== -1 && i > 0) {
+          var relWords = [w];
+          i++;
+          while (i < words.length) {
+            if (words[i].post.indexOf(',') !== -1 || coordConjunctions.indexOf(words[i].lower) !== -1) {
+              if (words[i].post.indexOf(',') !== -1) { relWords.push(words[i]); i++; }
+              break;
+            }
+            relWords.push(words[i]);
+            i++;
+            var hasVerb = false;
+            for (var r = 0; r < relWords.length; r++) {
+              if (relWords[r].tags.indexOf('Verb') !== -1 || relWords[r].tags.indexOf('PastTense') !== -1 || relWords[r].tags.indexOf('PresentTense') !== -1) hasVerb = true;
+            }
+            if (hasVerb && i < words.length) {
+              var nextPOS = getPOS(words[i]);
+              if (nextPOS === '동' || coordConjunctions.indexOf(words[i].lower) !== -1 || words[i].post.indexOf('.') !== -1) break;
+            }
+          }
+          var relText = relWords.map(function(rw) { return rw.pre + rw.text + rw.post; }).join('');
+          chunks.push({ text: relText.trim(), pos: '형', role: 'M' });
+          continue;
+        }
+
+        var pos = getPOS(w);
+
+        if (pos === '명' || (!foundSubject && pos === null && ['the','a','an'].indexOf(lower) !== -1)) {
+          var nounWords = [w];
+          i++;
+          while (i < words.length) {
+            var np = getPOS(words[i]);
+            if (np === '명' || np === '형' || ['the','a','an','of','and'].indexOf(words[i].lower) !== -1) {
+              nounWords.push(words[i]);
+              i++;
+            } else {
+              break;
+            }
+          }
+          var nounText = nounWords.map(function(nw) { return nw.pre + nw.text + nw.post; }).join('');
+          var role = 'M';
+          if (!foundSubject) { role = 'S'; foundSubject = true; }
+          else if (foundVerb) { role = 'O'; }
+          chunks.push({ text: nounText.trim(), pos: '명', role: role });
+          continue;
+        }
+
+        if (pos === '동') {
+          var verbWords = [w];
+          i++;
+          while (i < words.length) {
+            var vp = getPOS(words[i]);
+            if (vp === '동' || words[i].tags.indexOf('Auxiliary') !== -1 || words[i].tags.indexOf('Modal') !== -1 || words[i].lower === 'not' || words[i].lower === "n't") {
+              verbWords.push(words[i]);
+              i++;
+            } else {
+              break;
+            }
+          }
+          var verbText = verbWords.map(function(vw) { return vw.pre + vw.text + vw.post; }).join('');
+          foundVerb = true;
+          chunks.push({ text: verbText.trim(), pos: '동', role: 'V' });
+          continue;
+        }
+
+        if (pos === '부' || prepositions.indexOf(lower) !== -1) {
+          var advWords = [w];
+          i++;
+          if (prepositions.indexOf(lower) !== -1) {
+            while (i < words.length) {
+              var ap = getPOS(words[i]);
+              if (ap === '명' || ap === '형' || ['the','a','an'].indexOf(words[i].lower) !== -1) {
+                advWords.push(words[i]);
+                i++;
+              } else {
+                break;
+              }
+            }
+          }
+          var advText = advWords.map(function(aw) { return aw.pre + aw.text + aw.post; }).join('');
+          chunks.push({ text: advText.trim(), pos: '부', role: 'M' });
+          continue;
+        }
+
+        if (pos === '형') {
+          var adjWords = [w];
+          i++;
+          while (i < words.length && getPOS(words[i]) === '형') {
+            adjWords.push(words[i]);
+            i++;
+          }
+          var adjText = adjWords.map(function(jw) { return jw.pre + jw.text + jw.post; }).join('');
+          var adjRole = 'M';
+          if (foundVerb && chunks.length > 0 && chunks[chunks.length - 1].pos === '동') {
+            var lastVerbLower = chunks[chunks.length - 1].text.toLowerCase();
+            for (var bv = 0; bv < beVerbs.length; bv++) {
+              if (lastVerbLower.indexOf(beVerbs[bv]) !== -1) { adjRole = 'C'; break; }
+            }
+            if (adjRole !== 'C') {
+              for (var lv = 0; lv < linkingVerbs.length; lv++) {
+                if (lastVerbLower.indexOf(linkingVerbs[lv]) !== -1) { adjRole = 'C'; break; }
+              }
+            }
+          }
+          chunks.push({ text: adjText.trim(), pos: '형', role: adjRole });
+          continue;
+        }
+
+        chunks.push({ text: w.pre + w.text + w.post, pos: pos, role: null });
+        i++;
+      }
+
+      return chunks;
+    }
+
+    function renderDiagram(chunks) {
+      diagramArea.innerHTML = '';
+      var line = document.createElement('div');
+      line.className = 'diagram-line';
+
+      for (var i = 0; i < chunks.length; i++) {
+        var c = chunks[i];
+        if (!c.text.trim()) continue;
+
+        var chunkEl = document.createElement('div');
+        var posClass = c.pos ? 'chunk-pos-' + c.pos : 'chunk-pos-none';
+        chunkEl.className = 'chunk ' + posClass;
+
+        var textEl = document.createElement('span');
+        textEl.className = 'chunk-text' + (c.pos ? ' has-pos' : '');
+        textEl.textContent = c.text;
+        chunkEl.appendChild(textEl);
+
+        if (c.pos || c.role) {
+          var labelEl = document.createElement('span');
+          labelEl.className = 'chunk-label';
+          var labelText = '';
+          if (c.pos && c.role) labelText = c.pos + '(' + c.role + ')';
+          else if (c.pos) labelText = c.pos;
+          else if (c.role) labelText = c.role;
+          labelEl.textContent = labelText;
+          chunkEl.appendChild(labelEl);
+        }
+
+        line.appendChild(chunkEl);
+      }
+
+      diagramArea.appendChild(line);
+    }
+
+    analyzeBtn.addEventListener('click', analyze);
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); analyze(); }
+    });
+    clearBtn.addEventListener('click', function() {
+      input.value = '';
+      diagramArea.innerHTML = '';
+      input.focus();
+    });
+    document.querySelectorAll('.example-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        input.value = chip.textContent;
+        analyze();
+      });
+    });
+  </script>
+</body>
+</html>
