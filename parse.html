@@ -70,45 +70,48 @@
     .input-area textarea:focus { outline: none; border-color: var(--text); }
     .input-area textarea::placeholder { color: var(--text-light); }
     .btn-row { display: flex; gap: 8px; margin-top: 12px; }
-    .btn-analyze {
-      padding: 11px 28px; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
-      border: none; cursor: pointer; font-family: inherit;
-      background: var(--text); color: var(--bg); transition: opacity 0.25s;
+    .btn-analyze, .btn-clear {
+      padding: 11px 24px; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+      border: none; cursor: pointer; font-family: inherit; transition: 0.25s ease;
     }
+    .btn-analyze { background: var(--text); color: var(--bg); }
     .btn-analyze:hover { opacity: 0.85; }
     .btn-clear {
-      padding: 11px 20px; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
-      border: 1.5px solid var(--border); cursor: pointer; font-family: inherit;
-      background: transparent; color: var(--text); transition: border-color 0.25s;
+      border: 1.5px solid var(--border); background: transparent; color: var(--text);
     }
     .btn-clear:hover { border-color: var(--text); }
 
     .diagram-area {
       padding: 32px; background: var(--bg-alt); border: 1px solid var(--border);
-      border-radius: 8px; min-height: 100px; margin-bottom: 32px;
-      overflow-x: auto;
+      border-radius: 8px; min-height: 80px; margin-bottom: 32px; overflow-x: auto;
     }
     .diagram-area:empty::before {
       content: '위에 영어 문장을 입력하고 분석 버튼을 눌러주세요.';
       color: var(--text-light); font-size: 0.9rem;
     }
     .diagram-line {
-      display: flex; flex-wrap: wrap; align-items: flex-start;
-      gap: 0 10px; margin-bottom: 8px;
+      display: flex; flex-wrap: wrap; align-items: flex-start; gap: 2px 10px;
     }
-    .chunk {
-      display: inline-flex; flex-direction: column; align-items: center;
-    }
+    .chunk { display: inline-flex; flex-direction: column; align-items: center; }
     .chunk-text {
       font-size: 1.1rem; line-height: 1.6; padding: 2px 4px;
       border-bottom: 2.5px solid transparent; white-space: nowrap;
     }
     .chunk-text.has-pos { cursor: default; }
     .chunk-label {
-      font-size: 0.7rem; font-weight: 700; margin-top: 4px;
+      font-size: 0.7rem; font-weight: 700; margin-top: 2px;
       letter-spacing: 0.02em; white-space: nowrap;
     }
-    .chunk-space { width: 6px; }
+    .chunk-trans {
+      font-size: 0.75rem; color: var(--text-light); margin-top: 2px;
+      max-width: 180px; text-align: center; word-break: keep-all;
+      border: none; background: transparent; font-family: inherit;
+      padding: 2px 4px; border-radius: 4px; outline: none;
+      cursor: text; width: 100%; min-width: 40px;
+    }
+    .chunk-trans:hover { background: var(--bg); }
+    .chunk-trans:focus { background: var(--bg); border: 1px solid var(--border); color: var(--text-mid); }
+    .chunk-trans::placeholder { color: var(--text-light); opacity: 0.5; font-size: 0.7rem; }
 
     .chunk-pos-명 .chunk-text { color: var(--pos-noun); border-bottom-color: var(--pos-noun); }
     .chunk-pos-명 .chunk-label { color: var(--pos-noun); }
@@ -160,6 +163,7 @@
       .diagram-area { padding: 20px; }
       .chunk-text { font-size: 0.95rem; }
       .chunk-label { font-size: 0.65rem; }
+      .chunk-trans { font-size: 0.68rem; }
     }
   </style>
 </head>
@@ -175,7 +179,7 @@
   <div class="container main">
     <p class="page-label">THE FOUNDATION · 직독직해 다이어그램</p>
     <h1 class="page-title">직독직해 다이어그램</h1>
-    <p class="page-desc">문장을 의미 단위(chunk)로 나누고, 품사 색상과 문장성분 라벨(S/V/O/C/M)로 구조를 시각화합니다.</p>
+    <p class="page-desc">문장을 의미 단위(chunk)로 나누고, 품사 색상과 문장성분 라벨(S/V/O/C/M)로 구조를 시각화합니다. 각 청크 아래에 직독직해를 입력해보세요.</p>
 
     <div class="input-area">
       <textarea id="sentenceInput" placeholder="영어 문장을 입력하세요.&#10;예: Many successful entrepreneurs attribute their achievements not to natural talent but to years of disciplined practice."></textarea>
@@ -190,7 +194,7 @@
     <div class="legend">
       <div class="legend-item"><span class="legend-dot" style="background:var(--pos-noun)"></span><span class="legend-label">명사</span><span class="legend-role">S / O / C</span></div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--pos-verb)"></span><span class="legend-label">동사</span><span class="legend-role">V</span></div>
-      <div class="legend-item"><span class="legend-dot" style="background:var(--pos-adj)"></span><span class="legend-label">형용사</span><span class="legend-role">M</span></div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pos-adj)"></span><span class="legend-label">형용사</span><span class="legend-role">M / C</span></div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--pos-adv)"></span><span class="legend-label">부사</span><span class="legend-role">M</span></div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--pos-none)"></span><span class="legend-label">접속사</span><span class="legend-role">무색</span></div>
     </div>
@@ -227,8 +231,8 @@
         <thead><tr><th>품사</th><th>기준</th><th>예시</th></tr></thead>
         <tbody>
           <tr><td style="color:var(--pos-noun);font-weight:700;">명</td><td>주어·목적어·보어 자리</td><td>동명사구(주어), to부정사(주어/목적어), that절(목적어)</td></tr>
-          <tr><td style="color:var(--pos-verb);font-weight:700;">동</td><td>본동사, 목적격보어 자리의 준동사</td><td>attribute, to reconsider(OC)</td></tr>
-          <tr><td style="color:var(--pos-adj);font-weight:700;">형</td><td>명사를 수식</td><td>관계사절, 동격 that절, 분사(명사수식), 전치사구(명사수식)</td></tr>
+          <tr><td style="color:var(--pos-verb);font-weight:700;">동</td><td>본동사, 목적격보어 자리의 준동사</td><td>attribute, to reconsider(OC), study(OC)</td></tr>
+          <tr><td style="color:var(--pos-adj);font-weight:700;">형</td><td>명사를 수식 / 보어(보충설명)</td><td>관계사절, 분사(명사수식), 형용사 보어(interesting)</td></tr>
           <tr><td style="color:var(--pos-adv);font-weight:700;">부</td><td>동사·형용사·문장 전체 수식</td><td>부사절, 분사구문, to부정사(목적/정도), 전치사구(동사수식)</td></tr>
         </tbody>
       </table>
@@ -241,18 +245,15 @@
     var analyzeBtn = document.getElementById('analyzeBtn');
     var clearBtn = document.getElementById('clearBtn');
 
-    // --- 단어 분류 사전 ---
     var COORD_CONJ = ['and','but','or','nor','yet','so'];
     var ADV_CLAUSE_CONJ = ['because','although','though','while','whereas','unless',
-      'since','until','when','whenever','where','wherever','once','as',
-      'after','before','if'];
+      'since','until','when','whenever','where','wherever','once','if'];
     var MULTI_WORD_CONJ = ['even though','even if','so that','in order to','as soon as',
-      'as long as','as far as','in case','now that','provided that','given that',
-      'so long as','inasmuch as','insofar as'];
-    var NOUN_CLAUSE_CONJ = ['what','whatever','whoever','whichever','wherever','however'];
+      'as long as','as far as','in case','now that','provided that','given that'];
+    var NOUN_CLAUSE_CONJ = ['what','whatever','whoever','whichever'];
     var REL_PRON = ['who','whom','whose','which'];
-    var PREPOSITIONS = ['in','on','at','to','for','with','by','from','of','about','into',
-      'through','during','before','after','above','below','between','under','over',
+    var PREPOSITIONS = ['in','on','at','for','with','by','from','of','about','into',
+      'through','during','above','below','between','under','over',
       'against','along','among','around','behind','beneath','beside','beyond','down',
       'inside','near','off','onto','out','outside','past','toward','towards',
       'upon','within','without','across','throughout','up','except','despite'];
@@ -261,7 +262,11 @@
       'remain','remained','feel','felt','look','looked','sound','sounded',
       'taste','tasted','smell','smelled','grow','grew','turn','turned',
       'prove','proved','get','got','stay','stayed'];
-    var OC_VERBS = ['persuade','persuades','persuaded','convince','convinces','convinced',
+    var BARE_OC_VERBS = ['make','makes','made','let','lets','have','has','had',
+      'see','sees','saw','seen','hear','hears','heard','watch','watches','watched',
+      'feel','feels','felt','notice','notices','noticed','observe','observes','observed',
+      'help','helps','helped'];
+    var TO_OC_VERBS = ['persuade','persuades','persuaded','convince','convinces','convinced',
       'ask','asks','asked','tell','tells','told','allow','allows','allowed',
       'force','forces','forced','enable','enables','enabled','cause','causes','caused',
       'encourage','encourages','encouraged','advise','advises','advised',
@@ -270,12 +275,10 @@
       'warn','warns','warned','remind','reminds','reminded',
       'order','orders','ordered','urge','urges','urged',
       'require','requires','required','compel','compels','compelled',
-      'make','makes','made','let','lets','have','has','had',
-      'help','helps','helped','see','sees','saw','seen',
-      'hear','hears','heard','watch','watches','watched',
-      'feel','feels','felt','notice','notices','noticed',
-      'observe','observes','observed','consider','considers','considered',
-      'find','finds','found','keep','keeps','kept','leave','leaves','left'];
+      'consider','considers','considered','find','finds','found',
+      'keep','keeps','kept','leave','leaves','left',
+      'want','wants','wanted','need','needs','needed','expect','expects','expected',
+      'get','gets','got'];
     var TO_OBJ_VERBS = ['want','wants','wanted','need','needs','needed',
       'hope','hopes','hoped','decide','decides','decided','plan','plans','planned',
       'agree','agrees','agreed','offer','offers','offered','promise','promises','promised',
@@ -290,11 +293,10 @@
       'start','starts','started','continue','continues','continued',
       'intend','intends','intended','appear','appears','appeared',
       'seem','seems','seemed','happen','happens','happened'];
-    var DETS = ['the','a','an','this','that','these','those','my','your','his','her',
+    var DETS = ['the','a','an','this','these','those','my','your','his','her',
       'its','our','their','each','every','some','any','no','all','both','few',
       'several','many','much','most','another','other','such','enough'];
 
-    // --- 헬퍼 함수 ---
     function has(w, tag) { return w.tags && w.tags.indexOf(tag) !== -1; }
     function isVerbTag(w) {
       return has(w,'Verb') || has(w,'PastTense') || has(w,'PresentTense') ||
@@ -310,75 +312,81 @@
     function wt(arr) {
       return arr.map(function(x) { return (x.pre || '') + x.text + (x.post || ''); }).join('').trim();
     }
-    function inList(val, list) { return list.indexOf(val) !== -1; }
+    function inList(v, l) { return l.indexOf(v) !== -1; }
+    function hasComma(w) { return w.post && w.post.indexOf(',') !== -1; }
+    function hasPeriod(w) { return w.post && /[.!?]/.test(w.post); }
 
     function checkMultiWordConj(words, idx) {
       for (var m = 0; m < MULTI_WORD_CONJ.length; m++) {
         var parts = MULTI_WORD_CONJ[m].split(' ');
-        var match = true;
+        var ok = true;
         for (var p = 0; p < parts.length; p++) {
-          if (idx + p >= words.length || words[idx + p].lower !== parts[p]) { match = false; break; }
+          if (idx + p >= words.length || words[idx + p].lower !== parts[p]) { ok = false; break; }
         }
-        if (match) return { conj: MULTI_WORD_CONJ[m], len: parts.length };
+        if (ok) return { conj: MULTI_WORD_CONJ[m], len: parts.length };
       }
       return null;
     }
 
+    function hasVerbInRange(words, from, to) {
+      for (var k = from; k < Math.min(to, words.length); k++) {
+        if (isVerbTag(words[k]) && !has(words[k],'Gerund')) return true;
+      }
+      return false;
+    }
+
+    function isMainVerbAhead(words, fromIdx) {
+      for (var k = fromIdx; k < Math.min(fromIdx + 10, words.length); k++) {
+        if (k > 0 && words[k - 1].lower === 'to') continue;
+        if ((has(words[k],'Verb') || has(words[k],'PastTense') || has(words[k],'PresentTense') || has(words[k],'Modal'))
+            && !has(words[k],'Gerund') && !has(words[k],'Participle')) return true;
+      }
+      return false;
+    }
+
     function collectClause(words, startIdx, endOnSecondVerb) {
-      var clauseWords = [words[startIdx]];
+      var cw = [words[startIdx]];
       var j = startIdx + 1;
-      var depth = 0;
-      var verbCount = 0;
+      var depth = 0, verbCount = 0;
       while (j < words.length) {
-        var wl = words[j].lower;
-        if (inList(wl, ADV_CLAUSE_CONJ) || checkMultiWordConj(words, j)) depth++;
-        if (isVerbTag(words[j]) && !has(words[j],'Auxiliary') && !has(words[j],'Gerund') && depth === 0) {
-          verbCount++;
-        }
+        if (inList(words[j].lower, ADV_CLAUSE_CONJ) || checkMultiWordConj(words, j)) depth++;
+        if (isVerbTag(words[j]) && !has(words[j],'Gerund') && depth === 0) verbCount++;
         if (endOnSecondVerb && depth === 0 && verbCount > 1) break;
-        clauseWords.push(words[j]);
-        if (words[j].post && words[j].post.indexOf(',') !== -1 && depth === 0 && verbCount >= 1) {
-          j++; break;
-        }
+        cw.push(words[j]);
+        if (hasComma(words[j]) && depth === 0 && verbCount >= 1) { j++; break; }
+        if (hasPeriod(words[j])) { j++; break; }
         j++;
       }
-      if (j >= words.length && clauseWords.length > 1) {
-        // reached end of sentence, that's fine
-      }
-      return { words: clauseWords, nextIdx: j };
+      return { words: cw, nextIdx: j };
     }
 
     function collectRelClause(words, startIdx) {
-      var relWords = [words[startIdx]];
+      var rw = [words[startIdx]];
       var j = startIdx + 1;
-      var verbFound = false;
-      var afterVerbNonVerb = false;
+      var verbFound = false, afterVerbNonVerb = false;
       while (j < words.length) {
         if (inList(words[j].lower, COORD_CONJ)) break;
         if (verbFound && !afterVerbNonVerb && !isVerbTag(words[j])) afterVerbNonVerb = true;
-        if (verbFound && afterVerbNonVerb && (has(words[j],'Modal') || has(words[j],'Auxiliary') ||
-            (isVerbTag(words[j]) && !has(words[j],'Gerund') && !has(words[j],'Participle')))) break;
+        if (verbFound && afterVerbNonVerb &&
+            (has(words[j],'Modal') || (isVerbTag(words[j]) && !has(words[j],'Gerund') && !has(words[j],'Participle')))) break;
         if (isVerbTag(words[j]) && !has(words[j],'Auxiliary') && !has(words[j],'Gerund')) verbFound = true;
-        relWords.push(words[j]);
-        if (words[j].post && words[j].post.indexOf(',') !== -1) { j++; break; }
-        if (words[j].post && (words[j].post.indexOf('.') !== -1 || words[j].post.indexOf('!') !== -1 || words[j].post.indexOf('?') !== -1)) { j++; break; }
+        rw.push(words[j]);
+        if (hasComma(words[j]) || hasPeriod(words[j])) { j++; break; }
         j++;
       }
-      return { words: relWords, nextIdx: j };
+      return { words: rw, nextIdx: j };
     }
 
     function collectPrepPhrase(words, startIdx) {
-      var pWords = [words[startIdx]];
+      var pw = [words[startIdx]];
       var j = startIdx + 1;
       while (j < words.length) {
-        var wl = words[j].lower;
         if (isNounTag(words[j]) || isAdjTag(words[j]) || has(words[j],'Determiner') ||
-            inList(wl, DETS) || wl === 'of' || has(words[j],'Gerund')) {
-          pWords.push(words[j]);
-          j++;
+            inList(words[j].lower, DETS) || words[j].lower === 'of' || has(words[j],'Gerund')) {
+          pw.push(words[j]); j++;
         } else break;
       }
-      return { words: pWords, nextIdx: j };
+      return { words: pw, nextIdx: j };
     }
 
     function collectToInfinitive(words, startIdx) {
@@ -389,14 +397,12 @@
         var wl = words[j].lower;
         if (isNounTag(words[j]) || isAdjTag(words[j]) || has(words[j],'Determiner') ||
             inList(wl, DETS) || has(words[j],'Adverb') || wl === 'not' || wl === "n't" ||
-            inList(wl, PREPOSITIONS) || wl === 'of') {
-          tw.push(words[j]);
-          j++;
-          if (inList(wl, PREPOSITIONS) || wl === 'of') {
-            while (j < words.length) {
-              if (isNounTag(words[j]) || isAdjTag(words[j]) || has(words[j],'Determiner') || inList(words[j].lower, DETS)) {
-                tw.push(words[j]); j++;
-              } else break;
+            inList(wl, PREPOSITIONS) || wl === 'of' || wl === 'to' || wl === 'before' || wl === 'after') {
+          tw.push(words[j]); j++;
+          if (inList(wl, PREPOSITIONS) || wl === 'of' || wl === 'to' || wl === 'before' || wl === 'after') {
+            while (j < words.length && (isNounTag(words[j]) || isAdjTag(words[j]) ||
+                   has(words[j],'Determiner') || inList(words[j].lower, DETS))) {
+              tw.push(words[j]); j++;
             }
           }
         } else break;
@@ -404,15 +410,18 @@
       return { words: tw, nextIdx: j };
     }
 
-    function isMainVerbAhead(words, fromIdx) {
-      for (var k = fromIdx; k < Math.min(fromIdx + 10, words.length); k++) {
-        if ((has(words[k],'Verb') || has(words[k],'PastTense') || has(words[k],'PresentTense') || has(words[k],'Modal'))
-            && !has(words[k],'Gerund') && !has(words[k],'Participle')) return true;
+    function findCommaAhead(words, from, max) {
+      for (var k = from; k < Math.min(from + max, words.length); k++) {
+        if (hasComma(words[k])) return k;
       }
-      return false;
+      return -1;
     }
 
-    // --- 메인 분석 ---
+    function hasSubjectAfterIdx(words, idx) {
+      if (idx >= words.length) return false;
+      return isNounTag(words[idx]) || has(words[idx],'Determiner') || has(words[idx],'Pronoun') || inList(words[idx].lower, DETS);
+    }
+
     function analyze() {
       var text = input.value.trim();
       if (!text) return;
@@ -421,11 +430,10 @@
       var words = [];
       for (var s = 0; s < json.length; s++) {
         var terms = json[s].terms;
-        for (var i = 0; i < terms.length; i++) {
-          var t = terms[i];
+        for (var t = 0; t < terms.length; t++) {
           words.push({
-            text: t.text, pre: t.pre || '', post: t.post || '',
-            tags: t.tags || [], lower: (t.text || '').toLowerCase()
+            text: terms[t].text, pre: terms[t].pre || '', post: terms[t].post || '',
+            tags: terms[t].tags || [], lower: (terms[t].text || '').toLowerCase()
           });
         }
       }
@@ -438,38 +446,35 @@
       var chunks = [];
       var i = 0;
       var foundS = false, foundV = false, foundO = false;
-      var lastVerbChunkWords = [];
+      var lastVerbWords = [];
 
       function last() { return chunks.length > 0 ? chunks[chunks.length - 1] : null; }
       function push(text, pos, role) {
-        if (!text.trim()) return;
+        text = text.trim();
+        if (!text) return;
         chunks.push({ text: text, pos: pos, role: role });
       }
-      function getLastVerbLower() {
-        if (lastVerbChunkWords.length === 0) return '';
-        for (var v = lastVerbChunkWords.length - 1; v >= 0; v--) {
-          var vl = lastVerbChunkWords[v].lower;
-          if (!inList(vl, ['not',"n't"]) && !has(lastVerbChunkWords[v],'Auxiliary') && !has(lastVerbChunkWords[v],'Modal')) return vl;
+      function getMainVerbLower() {
+        for (var v = lastVerbWords.length - 1; v >= 0; v--) {
+          var vl = lastVerbWords[v].lower;
+          if (!inList(vl, ['not',"n't"]) && !has(lastVerbWords[v],'Auxiliary') && !has(lastVerbWords[v],'Modal')) return vl;
         }
-        return lastVerbChunkWords[lastVerbChunkWords.length - 1].lower;
+        return lastVerbWords.length > 0 ? lastVerbWords[lastVerbWords.length - 1].lower : '';
       }
-      function isBeOrLinking() {
-        for (var v = 0; v < lastVerbChunkWords.length; v++) {
-          var vl = lastVerbChunkWords[v].lower;
-          if (inList(vl, BE_VERBS) || inList(vl, LINKING_VERBS)) return true;
+      function isBeOrLink() {
+        for (var v = 0; v < lastVerbWords.length; v++) {
+          if (inList(lastVerbWords[v].lower, BE_VERBS) || inList(lastVerbWords[v].lower, LINKING_VERBS)) return true;
         }
         return false;
       }
-      function isOCVerb() {
-        var vl = getLastVerbLower();
-        return inList(vl, OC_VERBS);
-      }
+      function isBareOC() { return inList(getMainVerbLower(), BARE_OC_VERBS); }
+      function isToOC() { return inList(getMainVerbLower(), TO_OC_VERBS); }
 
       while (i < words.length) {
         var w = words[i];
         var lower = w.lower;
 
-        // --- 1. 다중단어 접속사 (even though, so that 등) ---
+        // === 1. 다중단어 접속사 ===
         var mwc = checkMultiWordConj(words, i);
         if (mwc) {
           var cl = collectClause(words, i, false);
@@ -478,16 +483,18 @@
           continue;
         }
 
-        // --- 2. 등위접속사 ---
+        // === 2. 등위접속사 ===
         if (inList(lower, COORD_CONJ) && lower !== 'for') {
           push(w.pre + w.text + w.post, null, null);
           i++; continue;
         }
 
-        // --- 3. 부사절 접속사 ---
-        if (inList(lower, ADV_CLAUSE_CONJ)) {
-          if (lower === 'that' || lower === 'since' || lower === 'as' || lower === 'before' || lower === 'after') {
-            // 이 단어들은 다른 용도로도 쓰이므로 아래에서 처리
+        // === 3. 부사절 접속사 (because/although/though/while/whereas/unless/if/when/whenever/where/wherever/once/until) ===
+        if (inList(lower, ADV_CLAUSE_CONJ) && lower !== 'since' && lower !== 'as' && lower !== 'that') {
+          if ((lower === 'before' || lower === 'after') && !hasVerbInRange(words, i + 1, i + 8)) {
+            // fall through to prep handling
+          } else if (lower === 'once' && !foundV && !foundS) {
+            // "once" as adverb, not conjunction
           } else {
             var cl = collectClause(words, i, false);
             i = cl.nextIdx;
@@ -496,70 +503,73 @@
           }
         }
 
-        // --- 4. because/although/though/while/whereas/unless/if/when/whenever/where/wherever/once ---
-        if ((lower === 'because' || lower === 'although' || lower === 'though' ||
-             lower === 'while' || lower === 'whereas' || lower === 'unless' ||
-             lower === 'if' || lower === 'when' || lower === 'whenever' ||
-             lower === 'where' || lower === 'wherever' || lower === 'once') &&
-            !(lower === 'once' && !foundV && !foundS)) {
+        // === 4. since/as (부사절) ===
+        if ((lower === 'since' || lower === 'as') && (foundV || (!foundS && hasVerbInRange(words, i + 1, i + 8)))) {
           var cl = collectClause(words, i, false);
           i = cl.nextIdx;
           push(wt(cl.words), '부', 'M');
           continue;
         }
 
-        // --- 5. 명사절 접속사 (what/whatever/whoever/whichever) ---
-        if (inList(lower, NOUN_CLAUSE_CONJ) && lower !== 'however') {
+        // === 5. 명사절 접속사 (what/whatever/whoever/whichever) ===
+        if (inList(lower, NOUN_CLAUSE_CONJ)) {
           var cl = collectClause(words, i, true);
           i = cl.nextIdx;
           var role = !foundS ? 'S' : 'O';
-          if (!foundS) foundS = true;
-          else foundO = true;
+          if (!foundS) foundS = true; else foundO = true;
           push(wt(cl.words), '명', role);
           continue;
         }
 
-        // --- 6. however (부사 양보) ---
+        // === 6. however (양보 부사) ===
         if (lower === 'however') {
           if (i + 1 < words.length && (isAdjTag(words[i+1]) || has(words[i+1],'Adverb'))) {
-            var hwWords = [w];
-            i++;
+            var hw = [w]; i++;
             while (i < words.length) {
-              if (words[i].post && words[i].post.indexOf(',') !== -1) {
-                hwWords.push(words[i]); i++; break;
-              }
-              hwWords.push(words[i]); i++;
+              hw.push(words[i]);
+              if (hasComma(words[i])) { i++; break; }
+              i++;
             }
-            push(wt(hwWords), '부', 'M');
+            push(wt(hw), '부', 'M');
             continue;
           }
           push(w.pre + w.text + w.post, '부', 'M');
           i++; continue;
         }
 
-        // --- 7. that --- (관계대명사/명사절/동격/결과)
+        // === 7. that (명사절/동격/관계대명사) ===
         if (lower === 'that') {
           if (foundV) {
-            var prevC = last();
-            if (prevC && prevC.pos === '명' && prevC.role !== 'S') {
-              // 동격 that절 → 형(M) (명사 수식)
+            var prev = last();
+            if (prev && prev.pos === '명' && prev.role !== 'S' && prev.role !== 'V') {
               var cl = collectClause(words, i, false);
               i = cl.nextIdx;
               push(wt(cl.words), '형', 'M');
               continue;
             }
-            // that 명사절 → 명(O)
             var cl = collectClause(words, i, false);
             i = cl.nextIdx;
             push(wt(cl.words), '명', 'O');
             foundO = true;
             continue;
           }
-          // that as determiner before verb found
-          // fall through to noun phrase handling
+          if (foundS && !foundV) {
+            var nextHasClause = false;
+            if (i + 1 < words.length && (has(words[i+1],'Pronoun') || isNounTag(words[i+1]) || has(words[i+1],'Determiner'))) {
+              for (var ti = i + 1; ti < Math.min(i + 10, words.length); ti++) {
+                if (isVerbTag(words[ti]) && !has(words[ti],'Gerund')) { nextHasClause = true; break; }
+              }
+            }
+            if (nextHasClause) {
+              var cl = collectClause(words, i, true);
+              i = cl.nextIdx;
+              push(wt(cl.words), '형', 'M');
+              continue;
+            }
+          }
         }
 
-        // --- 8. 관계대명사 (who/whom/whose/which) ---
+        // === 8. 관계대명사 (who/whom/whose/which) ===
         if (inList(lower, REL_PRON) && foundS) {
           var rc = collectRelClause(words, i);
           i = rc.nextIdx;
@@ -567,72 +577,60 @@
           continue;
         }
 
-        // --- 9. there (유도부사) ---
+        // === 9. there (유도부사) ===
         if (lower === 'there' && !foundV) {
           push(w.pre + w.text + w.post, '부', 'M');
           i++; continue;
         }
 
-        // --- 10. to ---
+        // === 10. to ===
         if (lower === 'to') {
-          // to + 동사원형 → to부정사
           if (i + 1 < words.length && (has(words[i+1],'Verb') || has(words[i+1],'Infinitive'))) {
             var ti = collectToInfinitive(words, i);
             i = ti.nextIdx;
             var tiText = wt(ti.words);
-
             if (!foundS) {
-              // 주어 자리 → 명(S)
               push(tiText, '명', 'S'); foundS = true;
-            } else if (foundV && foundO && isOCVerb()) {
-              // 목적격보어 → 동(C)
-              push(tiText, '동', 'C');
-            } else if (foundV && inList(getLastVerbLower(), TO_OBJ_VERBS) && !foundO) {
-              // want to go 류 → 명(O)
+            } else if (foundV && foundO && isToOC()) {
+              push(tiText, '동', 'OC');
+            } else if (foundV && inList(getMainVerbLower(), TO_OBJ_VERBS) && !foundO) {
               push(tiText, '명', 'O'); foundO = true;
-            } else if (foundV && isBeOrLinking() && !foundO) {
-              // be to do → 명(C)
+            } else if (foundV && isBeOrLink() && !foundO) {
               push(tiText, '명', 'C');
-            } else if (foundV) {
-              var prevC = last();
-              if (prevC && prevC.pos === '명' && (prevC.role === 'S' || prevC.role === 'O')) {
-                // 명사 바로 뒤 to부정사 → 형(M) (명사수식) vs 부(M) (목적/결과)
-                // 간단한 휴리스틱: 주어 뒤 to부정사가 아닌 경우 대부분 부
-                push(tiText, '부', 'M');
+            } else if (!foundV) {
+              push(tiText, '부', 'M');
+            } else {
+              var prev = last();
+              if (prev && prev.pos === '명') {
+                push(tiText, '형', 'M');
               } else {
                 push(tiText, '부', 'M');
               }
-            } else {
-              push(tiText, '부', 'M');
             }
             continue;
           }
-          // to + 명사 → 전치사구
           var pp = collectPrepPhrase(words, i);
           i = pp.nextIdx;
-          var prevC = last();
-          var ppos = (prevC && prevC.pos === '명' && !foundV) ? '형' : '부';
-          push(wt(pp.words), ppos, 'M');
+          var prev = last();
+          push(wt(pp.words), (prev && prev.pos === '명' && !foundV) ? '형' : '부', 'M');
           continue;
         }
 
-        // --- 11. 분사구문 (문장 시작, 콤마 있음) ---
-        if (!foundS && (has(w,'Gerund') || has(w,'Participle'))) {
-          var commaAt = -1;
-          for (var pc = i; pc < Math.min(i + 15, words.length); pc++) {
-            if (words[pc].post && words[pc].post.indexOf(',') !== -1) { commaAt = pc; break; }
-          }
-          if (commaAt !== -1) {
-            var pw = [];
-            var j = i;
-            while (j <= commaAt) { pw.push(words[j]); j++; }
-            i = j;
-            push(wt(pw), '부', 'M');
-            continue;
+        // === 11. 분사구문 (문장 시작 + 콤마 → 부(M)) ===
+        if (!foundS) {
+          var commaAt = findCommaAhead(words, i, 15);
+          if (commaAt !== -1 && hasSubjectAfterIdx(words, commaAt + 1)) {
+            if (has(w,'Gerund') || has(w,'Participle') || has(w,'PastTense') || has(w,'Auxiliary')) {
+              var pw = [];
+              for (var j = i; j <= commaAt; j++) pw.push(words[j]);
+              i = commaAt + 1;
+              push(wt(pw), '부', 'M');
+              continue;
+            }
           }
         }
 
-        // --- 12. 동명사 주어 ---
+        // === 12. 동명사 주어 ===
         if (!foundS && has(w,'Gerund')) {
           var gw = [w]; i++;
           while (i < words.length) {
@@ -640,9 +638,12 @@
             if (has(words[i],'Adverb') && i + 1 < words.length && isVerbTag(words[i+1]) && !has(words[i+1],'Gerund')) break;
             if (isNounTag(words[i]) || isAdjTag(words[i]) || has(words[i],'Determiner') ||
                 inList(words[i].lower, DETS) || has(words[i],'Adverb') ||
-                inList(words[i].lower, PREPOSITIONS) || words[i].lower === 'of' || has(words[i],'Gerund')) {
+                inList(words[i].lower, PREPOSITIONS) || words[i].lower === 'of' ||
+                words[i].lower === 'to' || words[i].lower === 'before' || words[i].lower === 'after' ||
+                has(words[i],'Gerund')) {
               gw.push(words[i]); i++;
-              if (i > 0 && (inList(words[i-1].lower, PREPOSITIONS) || words[i-1].lower === 'of')) {
+              if (i > 0 && (inList(words[i-1].lower, PREPOSITIONS) || words[i-1].lower === 'of' ||
+                  words[i-1].lower === 'to' || words[i-1].lower === 'before' || words[i-1].lower === 'after')) {
                 while (i < words.length && (isNounTag(words[i]) || isAdjTag(words[i]) ||
                        has(words[i],'Determiner') || inList(words[i].lower, DETS))) {
                   gw.push(words[i]); i++;
@@ -654,37 +655,34 @@
           continue;
         }
 
-        // --- 13. 분사구 (콤마 뒤, 명사 수식) → 형(M) ---
-        if (foundS && !foundV && has(w,'Participle') && !has(w,'Verb') &&
-            i > 0 && words[i-1].post && words[i-1].post.indexOf(',') !== -1) {
+        // === 13. 분사 수식어 (S 뒤, V 전, 뒤에 주절 동사 있음) ===
+        if (foundS && !foundV && has(w,'Participle') && isMainVerbAhead(words, i + 1)) {
           var modW = [w]; i++;
           while (i < words.length) {
-            if (isVerbTag(words[i]) && !has(words[i],'Gerund') && !has(words[i],'Participle') && !has(words[i],'Auxiliary')) break;
-            if (words[i].post && words[i].post.indexOf(',') !== -1) { modW.push(words[i]); i++; break; }
+            if (isVerbTag(words[i]) && !has(words[i],'Gerund') && !has(words[i],'Participle') && !has(words[i],'Auxiliary')) {
+              if (i > 0 && words[i-1].lower !== 'to') break;
+            }
+            if (hasComma(words[i])) { modW.push(words[i]); i++; break; }
             modW.push(words[i]); i++;
           }
           push(wt(modW), '형', 'M');
           continue;
         }
 
-        // --- 14. 전치사구 ---
-        if (inList(lower, PREPOSITIONS) || lower === 'of') {
+        // === 14. 전치사구 (before/after 포함) ===
+        if (inList(lower, PREPOSITIONS) || lower === 'of' || lower === 'before' || lower === 'after') {
           var pp = collectPrepPhrase(words, i);
           i = pp.nextIdx;
-          var prevC = last();
+          var prev = last();
           var ppos;
-          if (lower === 'of' && prevC && prevC.pos === '명') {
-            ppos = '형';
-          } else if (prevC && prevC.pos === '명' && !foundV) {
-            ppos = '형';
-          } else {
-            ppos = '부';
-          }
+          if ((lower === 'of' || lower === 'between') && prev && prev.pos === '명') ppos = '형';
+          else if (prev && prev.pos === '명' && !foundV) ppos = '형';
+          else ppos = '부';
           push(wt(pp.words), ppos, 'M');
           continue;
         }
 
-        // --- 15. for (접속사 or 전치사) ---
+        // === 15. for (전치사) ===
         if (lower === 'for') {
           var pp = collectPrepPhrase(words, i);
           i = pp.nextIdx;
@@ -692,40 +690,62 @@
           continue;
         }
 
-        // --- 16. 부사 단독 (not, n't, 일반부사) ---
+        // === 16. 부사 ===
         if (lower === 'not' || lower === "n't" || has(w,'Adverb') || has(w,'Negative')) {
-          if (!foundV) {
-            // 동사 앞 부사는 일단 다음 동사와 합칠 수 있지만, 기준표에 따라 별도 청크
-            push(w.pre + w.text + w.post, '부', 'M');
-            i++; continue;
-          }
           push(w.pre + w.text + w.post, '부', 'M');
           i++; continue;
         }
 
-        // --- 17. 동사구 ---
+        // === 17. 사역/지각동사 목적격보어 (bare infinitive) ===
+        if (isVerbTag(w) && !has(w,'Gerund') && foundV && foundO && isBareOC()) {
+          var ocw = [w]; i++;
+          while (i < words.length) {
+            if (isNounTag(words[i]) || isAdjTag(words[i]) || has(words[i],'Determiner') ||
+                inList(words[i].lower, DETS) || has(words[i],'Adverb') ||
+                inList(words[i].lower, PREPOSITIONS) || words[i].lower === 'of') {
+              ocw.push(words[i]); i++;
+              if (inList(words[i-1].lower, PREPOSITIONS) || words[i-1].lower === 'of') {
+                while (i < words.length && (isNounTag(words[i]) || isAdjTag(words[i]) ||
+                       has(words[i],'Determiner') || inList(words[i].lower, DETS))) {
+                  ocw.push(words[i]); i++;
+                }
+              }
+            } else break;
+          }
+          push(wt(ocw), '동', 'OC');
+          continue;
+        }
+
+        // === 18. 동사구 ===
         if (isVerbTag(w) && !has(w,'Gerund') && foundS) {
           var vw = [w]; i++;
           while (i < words.length) {
             if (has(words[i],'Auxiliary') || has(words[i],'Modal') ||
                 words[i].lower === 'not' || words[i].lower === "n't" ||
-                (isVerbTag(words[i]) && !has(words[i],'Gerund') && !has(words[i],'Participle') &&
-                 !isNounTag(words[i]))) {
+                (isVerbTag(words[i]) && !has(words[i],'Gerund') && !has(words[i],'Participle') && !isNounTag(words[i]))) {
               vw.push(words[i]); i++;
             } else break;
           }
           foundV = true;
-          lastVerbChunkWords = vw;
+          lastVerbWords = vw;
           push(wt(vw), '동', 'V');
           continue;
         }
 
-        // --- 18. 명사구 ---
+        // === 19. 명사구 ===
         if (isNounTag(w) || isAdjTag(w) || has(w,'Determiner') || inList(lower, DETS) ||
             (has(w,'Gerund') && foundV)) {
           var nw = [w]; i++;
           while (i < words.length) {
             if (foundS && !foundV && isVerbTag(words[i]) && !has(words[i],'Gerund') && !has(words[i],'Participle')) break;
+            if (words[i].lower === 'that' && i + 2 < words.length) {
+              var thatIsClause = false;
+              if (has(words[i+1],'Pronoun') || (isNounTag(words[i+1]) && hasVerbInRange(words, i+2, i+6))) thatIsClause = true;
+              if (thatIsClause) break;
+            }
+            if (foundV && !foundO && isNounTag(w) && nw.length >= 1 && has(w,'Pronoun') &&
+                (has(words[i],'Determiner') || inList(words[i].lower, DETS)) && isBareOC()) break;
+            if (foundV && foundO && isBareOC() && isVerbTag(words[i]) && !has(words[i],'Gerund')) break;
             if (isNounTag(words[i]) || isAdjTag(words[i]) || has(words[i],'Determiner') ||
                 inList(words[i].lower, DETS) || words[i].lower === 'of' ||
                 (has(words[i],'Gerund') && !isMainVerbAhead(words, i + 1))) {
@@ -739,33 +759,28 @@
             } else break;
           }
           var nt = wt(nw);
-          var hasNounWord = false;
+          var hasNoun = false;
           for (var ni = 0; ni < nw.length; ni++) {
-            if (isNounTag(nw[ni]) || has(nw[ni],'Determiner') || has(nw[ni],'Gerund')) { hasNounWord = true; break; }
+            if (isNounTag(nw[ni]) || has(nw[ni],'Determiner') || has(nw[ni],'Gerund')) { hasNoun = true; break; }
           }
-          var cPos = hasNounWord ? '명' : '형';
-
+          var cPos = hasNoun ? '명' : '형';
           if (cPos === '형') {
-            push(nt, '형', 'M');
+            if (foundV && isBeOrLink() && !foundO) push(nt, '형', 'C');
+            else push(nt, '형', 'M');
           } else if (!foundS) {
             push(nt, '명', 'S'); foundS = true;
           } else if (foundV) {
-            if (isBeOrLinking() && !foundO) {
-              push(nt, '명', 'C');
-            } else if (foundO && isOCVerb()) {
-              push(nt, '명', 'C');
-            } else {
-              push(nt, '명', 'O'); foundO = true;
-            }
+            if (isBeOrLink() && !foundO) push(nt, '명', 'C');
+            else if (foundO && (isBareOC() || isToOC())) push(nt, '명', 'C');
+            else { push(nt, '명', 'O'); foundO = true; }
           } else {
             push(nt, '명', 'M');
           }
           continue;
         }
 
-        // --- 19. 동사 (주어 전 - be동사 등) ---
+        // === 20. 동사 (주어 전 - 명령문/도치) ===
         if (isVerbTag(w) && !foundS) {
-          // 명령문이거나 도치 구문
           var vw = [w]; i++;
           while (i < words.length) {
             if (has(words[i],'Auxiliary') || has(words[i],'Modal') ||
@@ -775,30 +790,34 @@
             } else break;
           }
           foundV = true; foundS = true;
-          lastVerbChunkWords = vw;
+          lastVerbWords = vw;
           push(wt(vw), '동', 'V');
           continue;
         }
 
-        // --- 20. than 비교구문 → 부(M) ---
+        // === 21. than 비교 ===
         if (lower === 'than') {
           var tw = [w]; i++;
-          while (i < words.length) {
-            tw.push(words[i]); i++;
-          }
+          while (i < words.length) { tw.push(words[i]); i++; }
           push(wt(tw), '부', 'M');
           continue;
         }
 
-        // --- 21. since/as/before/after (부사절 접속사로 사용될 때) ---
+        // === 22. since/as/before/after (동사 뒤 부사절) ===
         if ((lower === 'since' || lower === 'as' || lower === 'before' || lower === 'after') && foundV) {
-          var cl = collectClause(words, i, false);
-          i = cl.nextIdx;
-          push(wt(cl.words), '부', 'M');
+          if (hasVerbInRange(words, i + 1, i + 8)) {
+            var cl = collectClause(words, i, false);
+            i = cl.nextIdx;
+            push(wt(cl.words), '부', 'M');
+            continue;
+          }
+          var pp = collectPrepPhrase(words, i);
+          i = pp.nextIdx;
+          push(wt(pp.words), '부', 'M');
           continue;
         }
 
-        // --- 22. 나머지 ---
+        // === 23. 나머지 ===
         if (chunks.length > 0 && chunks[chunks.length - 1].pos) {
           chunks[chunks.length - 1].text += (w.pre || '') + w.text + (w.post || '');
         } else {
@@ -806,46 +825,30 @@
         }
         i++;
       }
-
       return chunks;
     }
 
     function ensureVerb(chunks, words) {
       var hasV = false;
-      for (var i = 0; i < chunks.length; i++) {
-        if (chunks[i].role === 'V') { hasV = true; break; }
-      }
+      for (var i = 0; i < chunks.length; i++) { if (chunks[i].role === 'V') { hasV = true; break; } }
       if (hasV) return chunks;
-
+      for (var i = 0; i < chunks.length; i++) { if (chunks[i].pos === '동') { chunks[i].role = 'V'; return chunks; } }
+      var vw = null;
+      for (var i = 0; i < words.length; i++) { if (isVerbTag(words[i]) && !has(words[i],'Gerund')) { vw = words[i].lower; break; } }
+      if (!vw) return chunks;
       for (var i = 0; i < chunks.length; i++) {
-        if (chunks[i].pos === '동') { chunks[i].role = 'V'; return chunks; }
-      }
-
-      var verbWord = null;
-      for (var i = 0; i < words.length; i++) {
-        if (isVerbTag(words[i]) && !has(words[i],'Gerund')) { verbWord = words[i].lower; break; }
-      }
-      if (!verbWord) {
-        for (var i = 0; i < words.length; i++) {
-          if (isVerbTag(words[i])) { verbWord = words[i].lower; break; }
-        }
-      }
-      if (!verbWord) return chunks;
-
-      for (var i = 0; i < chunks.length; i++) {
-        var ct = chunks[i].text.toLowerCase();
-        var re = new RegExp('\\b' + verbWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b');
-        if (re.test(ct) && chunks[i].pos !== '동') {
-          var m = re.exec(ct);
+        var re = new RegExp('\\b' + vw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b');
+        if (re.test(chunks[i].text.toLowerCase()) && chunks[i].pos !== '동') {
+          var m = re.exec(chunks[i].text.toLowerCase());
           var before = chunks[i].text.substring(0, m.index).trim();
-          var verb = chunks[i].text.substring(m.index, m.index + verbWord.length);
-          var after = chunks[i].text.substring(m.index + verbWord.length).trim();
-          var newChunks = chunks.slice(0, i);
-          if (before) newChunks.push({ text: before, pos: chunks[i].pos, role: chunks[i].role });
-          newChunks.push({ text: verb, pos: '동', role: 'V' });
-          if (after) newChunks.push({ text: after, pos: '명', role: 'O' });
-          for (var j = i + 1; j < chunks.length; j++) newChunks.push(chunks[j]);
-          return newChunks;
+          var verb = chunks[i].text.substring(m.index, m.index + vw.length);
+          var after = chunks[i].text.substring(m.index + vw.length).trim();
+          var nc = chunks.slice(0, i);
+          if (before) nc.push({ text: before, pos: chunks[i].pos, role: chunks[i].role });
+          nc.push({ text: verb, pos: '동', role: 'V' });
+          if (after) nc.push({ text: after, pos: '명', role: 'O' });
+          for (var j = i + 1; j < chunks.length; j++) nc.push(chunks[j]);
+          return nc;
         }
       }
       return chunks;
@@ -855,34 +858,31 @@
       diagramArea.innerHTML = '';
       var line = document.createElement('div');
       line.className = 'diagram-line';
-
       for (var i = 0; i < chunks.length; i++) {
         var c = chunks[i];
         if (!c.text.trim()) continue;
-
-        var chunkEl = document.createElement('div');
-        var posClass = c.pos ? 'chunk-pos-' + c.pos : 'chunk-pos-none';
-        chunkEl.className = 'chunk ' + posClass;
-
+        var el = document.createElement('div');
+        el.className = 'chunk ' + (c.pos ? 'chunk-pos-' + c.pos : 'chunk-pos-none');
         var textEl = document.createElement('span');
         textEl.className = 'chunk-text' + (c.pos ? ' has-pos' : '');
         textEl.textContent = c.text;
-        chunkEl.appendChild(textEl);
-
+        el.appendChild(textEl);
         var labelText = '';
         if (c.pos && c.role) labelText = c.pos + '(' + c.role + ')';
         else if (c.pos) labelText = c.pos;
-
         if (labelText) {
-          var labelEl = document.createElement('span');
-          labelEl.className = 'chunk-label';
-          labelEl.textContent = labelText;
-          chunkEl.appendChild(labelEl);
+          var lb = document.createElement('span');
+          lb.className = 'chunk-label';
+          lb.textContent = labelText;
+          el.appendChild(lb);
         }
-
-        line.appendChild(chunkEl);
+        var transInput = document.createElement('input');
+        transInput.type = 'text';
+        transInput.className = 'chunk-trans';
+        transInput.placeholder = '해석';
+        el.appendChild(transInput);
+        line.appendChild(el);
       }
-
       diagramArea.appendChild(line);
     }
 
